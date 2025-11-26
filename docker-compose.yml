@@ -20,12 +20,19 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_started
     environment:
       - JWT_SECRET=dev_secret_change_me
       - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/nahb?authSource=admin
       - PORT=4000
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build: ./frontend

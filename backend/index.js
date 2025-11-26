@@ -617,4 +617,33 @@ app.delete('/api/admin/users/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// Health check endpoint for Docker
+app.get('/api/health', (req, res) => {
+  const healthcheck = {
+    uptime: process.uptime(),
+    message: 'OK',
+    timestamp: Date.now(),
+    mongoStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  };
+  
+  if (mongoose.connection.readyState === 1) {
+    res.status(200).json(healthcheck);
+  } else {
+    res.status(503).json({ ...healthcheck, message: 'Service Unavailable' });
+  }
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('❌ Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
+});
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('🛑 SIGTERM signal received: closing HTTP server');
+  await mongoose.connection.close();
+  process.exit(0);
+});
+
 app.listen(PORT, () => console.log(`🚀 NAHB backend running on port ${PORT}`));
