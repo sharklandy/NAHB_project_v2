@@ -6,7 +6,8 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   const [currentStoryId, setCurrentStoryId] = useState(storyId);
   const [page, setPage] = useState(null);
   const [storyTitle, setStoryTitle] = useState('');
-  const [storyTheme, setStoryTheme] = useState('fantasy-theme');
+  const [storyTheme, setStoryTheme] = useState('');
+  const [userThemeMode, setUserThemeMode] = useState('light'); // light ou dark
   
   useEffect(() => {
     console.log('PlayView useEffect, storyId:', storyId);
@@ -31,12 +32,8 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     const story = await res.json();
     setStoryTitle(story.title || 'Histoire');
     
-    // Déterminer le thème basé sur les tags de l'histoire
-    if(story.tags && story.tags.includes('fantasy')) {
-      setStoryTheme('fantasy-theme');
-    } else {
-      setStoryTheme('fantasy-theme'); // Par défaut
-    }
+    // Déterminer le thème basé sur le champ theme de l'histoire
+    setStoryTheme(story.theme || 'Fantasy');
   }
   
   async function choose(choiceIndex){
@@ -60,8 +57,26 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     }
   }
   
+  // Déterminer la classe de thème
+  const getThemeClass = () => {
+    if (storyTheme === 'Fantasy' && userThemeMode === 'light') {
+      return 'theme-fantasy-light';
+    }
+    // Ajouter d'autres thèmes ici plus tard
+    return '';
+  };
+  
   return (
-    <div className="play-view-container">
+    <div className={`play-view-container ${getThemeClass()}`}>
+      {/* Éléments de décor pour fantasy-light */}
+      {storyTheme === 'Fantasy' && userThemeMode === 'light' && (
+        <div className="theme-background-fantasy-light">
+          <div className="fantasy-bg-layer"></div>
+          <div className="fantasy-tower"></div>
+          <div className="fantasy-dragon"></div>
+        </div>
+      )}
+      
       {storyTitle && (
         <div className="story-header">
           <h2>{storyTitle}</h2>

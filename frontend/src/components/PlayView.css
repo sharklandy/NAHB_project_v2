@@ -1,7 +1,111 @@
 .play-view-container {
   max-width: 900px;
   margin: 0 auto;
+  position: relative;
 }
+
+/* ==================== THÈME FANTASY LIGHT ==================== */
+.theme-fantasy-light {
+  position: relative;
+  min-height: 100vh;
+}
+
+.theme-background-fantasy-light {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* Background fixe */
+.fantasy-bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/fantasy-light/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Dragon avec animation d'aller-retour lent */
+.fantasy-dragon {
+  position: absolute;
+  top: 20%;
+  left: -15%;
+  width: 250px;
+  height: 250px;
+  background-image: url('../assets/fantasy-light/dragon.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  animation: dragonFly 30s ease-in-out infinite;
+}
+
+/* Tour centrée et responsive - même largeur que le contenu */
+.fantasy-tower {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  width: 900px;
+  max-width: 90vw;
+  height: 90vh;
+  background-image: url('../assets/fantasy-light/tour.png');
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+@keyframes dragonFly {
+  0% {
+    left: -15%;
+    transform: scaleX(1);
+  }
+  50% {
+    left: 100%;
+    transform: scaleX(1);
+  }
+  51% {
+    transform: scaleX(-1);
+  }
+  100% {
+    left: -15%;
+    transform: scaleX(-1);
+  }
+}
+
+/* Ajustements responsive pour le dragon */
+@media (max-width: 768px) {
+  .fantasy-dragon {
+    width: 150px;
+    height: 150px;
+    top: 15%;
+  }
+  
+  .fantasy-tower {
+    width: 90vw;
+    height: 60vh;
+  }
+}
+
+/* Contenu avec fond semi-transparent pour fantasy theme */
+.theme-fantasy-light .story-header,
+.theme-fantasy-light .story-page,
+.theme-fantasy-light .select-message {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* ==================== STYLES PAR DÉFAUT ==================== */
 
 .story-header {
   background: white;
