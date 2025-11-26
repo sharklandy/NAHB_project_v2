@@ -20,6 +20,7 @@ const storySchema = new mongoose.Schema({
   status: { type: String, enum: ['draft', 'published', 'suspended'], default: 'draft' },
   pages: [pageSchema],
   startPageId: { type: String, default: null },
+  theme: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now }
 });
 

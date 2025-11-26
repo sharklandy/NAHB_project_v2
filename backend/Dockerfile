@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
-# Install wget for healthcheck
-RUN apk add --no-cache wget
+# Install dependencies needed for bcrypt and healthcheck
+RUN apk add --no-cache wget python3 make g++
 
 WORKDIR /app
 COPY package.json package-lock.json* ./

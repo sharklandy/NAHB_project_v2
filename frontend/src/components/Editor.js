@@ -18,10 +18,29 @@ export default function Editor({ api, token, user }){
   const [selected, setSelected] = useState(null);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
+  const [theme, setTheme] = useState('');
   const [pageContent, setPageContent] = useState('');
   const [isEnd, setIsEnd] = useState(false);
   const [editingPage, setEditingPage] = useState(null);
   const [error, setError] = useState(null);
+  
+  // Liste des thèmes disponibles
+  const availableThemes = [
+    'Fantasy',
+    'Science-Fiction',
+    'Horreur',
+    'Mystère',
+    'Romance',
+    'Aventure',
+    'Historique',
+    'Contemporain',
+    'Post-apocalyptique',
+    'Cyberpunk',
+    'Steampunk',
+    'Thriller',
+    'Comédie',
+    'Drame'
+  ];
 
   useEffect(()=> { load(); }, []);
 
@@ -46,10 +65,10 @@ export default function Editor({ api, token, user }){
   }
 
   async function createStory(){
-    const res = await fetch(api + '/stories', { method:'POST', headers: {'Content-Type':'application/json', Authorization: 'Bearer '+token}, body: JSON.stringify({ title, description: desc })});
+    const res = await fetch(api + '/stories', { method:'POST', headers: {'Content-Type':'application/json', Authorization: 'Bearer '+token}, body: JSON.stringify({ title, description: desc, theme })});
     const j = await res.json();
     setStories([j, ...stories]);
-    setTitle(''); setDesc('');
+    setTitle(''); setDesc(''); setTheme('');
     setSelected(j);
   }
 
@@ -123,10 +142,41 @@ export default function Editor({ api, token, user }){
       <section style={{display:'flex', gap:20}}>
         <div style={{flex:1}}>
           <h3>Vos histoires</h3>
-          <div>
-            <input placeholder="Titre" value={title} onChange={e=>setTitle(e.target.value)} />
-            <input placeholder="Description" value={desc} onChange={e=>setDesc(e.target.value)} />
-            <button onClick={createStory}>Créer</button>
+          <div className="story-form">
+            <div className="form-group">
+              <label>Titre</label>
+              <input 
+                type="text"
+                placeholder="Titre de l'histoire" 
+                value={title} 
+                onChange={e=>setTitle(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea 
+                placeholder="Description de l'histoire" 
+                value={desc} 
+                onChange={e=>setDesc(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="form-group">
+              <label>Thème</label>
+              <select 
+                value={theme} 
+                onChange={e=>setTheme(e.target.value)}
+                className="theme-select"
+              >
+                <option value="">-- Sélectionner un thème --</option>
+                {availableThemes.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-actions">
+              <button className="btn-primary" onClick={createStory}>Créer l'histoire</button>
+            </div>
           </div>
           <ul>
             {stories.map(s=>(
