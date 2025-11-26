@@ -1,0 +1,281 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { Low } = require('lowdb');
+const { JSONFile } = require('lowdb/node');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { nanoid } = require('nanoid');
+const path = require('path');
+const fs = require('fs');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
+const PORT = process.env.PORT || 4000;
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+// Setup lowdb
+const file = path.join(__dirname, 'db.json');
+const adapter = new JSONFile(file);
+const db = new Low(adapter);
+
+async function initDB(){
+  await db.read();
+  db.data = db.data || { users: [], stories: [], plays: [], admins: [] };
+  // create a default admin
+  if(!db.data.admins.find(a => a.email === 'admin@nahb.local')){
+    db.data.admins.push({ id: nanoid(), email: 'admin@nahb.local' });
+  }
+  await db.write();
+}
+initDB();
+
+// --- Helpers ---
+function authMiddleware(req, res, next){
+  const header = req.headers.authorization;
+  if(!header) return res.status(401).json({ error: 'Missing Authorization header' });
+  const token = header.split(' ')[1];
+  try{
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+    next();
+  }catch(e){
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+function authorOrAdminMiddleware(req, res, next){
+  // ensure user is either resource owner or admin
+  const userId = req.user?.id;
+  const storyId = req.params.storyId || req.body.storyId;
+  if(!storyId) return res.status(400).json({ error: 'storyId required' });
+  const story = db.data.stories.find(s => s.id === storyId);
+  if(!story) return res.status(404).json({ error: 'Story not found' });
+  if(story.authorId === userId || db.data.admins.some(a => a.email === req.user.email)) return next();
+  return res.status(403).json({ error: 'Forbidden' });
+}
+
+// --- Auth ---
+app.post('/api/auth/register', async (req, res) => {
+  await db.read();
+  const { username, email, password } = req.body;
+  if(!email || !password) return res.status(400).json({ error: 'email and password required' });
+  if(db.data.users.find(u => u.email === email)) return res.status(400).json({ error: 'email exists' });
+  const hashed = await bcrypt.hash(password, 10);
+  const user = { id: nanoid(), username: username || email.split('@')[0], email, password: hashed };
+  db.data.users.push(user);
+  await db.write();
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+  res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  await db.read();
+  const { email, password } = req.body;
+  const user = db.data.users.find(u => u.email === email);
+  if(!user) return res.status(400).json({ error: 'invalid credentials' });
+  if(user.banned) return res.status(403).json({ error: 'user is banned' });
+  const ok = await bcrypt.compare(password, user.password);
+  if(!ok) return res.status(400).json({ error: 'invalid credentials' });
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+  res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+});
+
+// --- Stories CRUD (authors) ---
+app.post('/api/stories', authMiddleware, async (req, res) => {
+  await db.read();
+  const { title, description, tags } = req.body;
+  const story = { id: nanoid(), title: title || 'Untitled', description: description || '', tags: tags || [], authorId: req.user.id, status: 'draft', pages: [], startPageId: null, createdAt: Date.now() };
+  db.data.stories.push(story);
+  await db.write();
+  res.json(story);
+});
+
+app.get('/api/stories', async (req, res) => {
+  await db.read();
+  const publishedOnly = req.query.published === '1';
+  const q = (req.query.q || '').toLowerCase();
+  let list = db.data.stories.slice().reverse();
+  if(publishedOnly) list = list.filter(s => s.status === 'published');
+  if(q) list = list.filter(s => s.title.toLowerCase().includes(q) || s.description.toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+  res.json(list);
+});
+
+app.get('/api/stories/:id', async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.id);
+  if(!story) return res.status(404).json({ error: 'not found' });
+  res.json(story);
+});
+
+app.put('/api/stories/:id', authMiddleware, async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.id);
+  if(!story) return res.status(404).json({ error: 'not found' });
+  if(story.authorId !== req.user.id) return res.status(403).json({ error: 'not owner' });
+  const { title, description, tags, status, startPageId } = req.body;
+  if(title !== undefined) story.title = title;
+  if(description !== undefined) story.description = description;
+  if(tags !== undefined) story.tags = tags;
+  if(status !== undefined) story.status = status;
+  if(startPageId !== undefined) story.startPageId = startPageId;
+  await db.write();
+  res.json(story);
+});
+
+app.delete('/api/stories/:id', authMiddleware, async (req, res) => {
+  await db.read();
+  const idx = db.data.stories.findIndex(s => s.id === req.params.id);
+  if(idx === -1) return res.status(404).json({ error: 'not found' });
+  const story = db.data.stories[idx];
+  if(story.authorId !== req.user.id) return res.status(403).json({ error: 'not owner' });
+  db.data.stories.splice(idx,1);
+  await db.write();
+  res.json({ ok: true });
+});
+
+// --- Pages & choices ---
+app.post('/api/stories/:id/pages', authMiddleware, async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.id);
+  if(!story) return res.status(404).json({ error: 'not found' });
+  if(story.authorId !== req.user.id) return res.status(403).json({ error: 'not owner' });
+  const { content, isEnd } = req.body;
+  const page = { id: nanoid(), content: content || '', isEnd: !!isEnd, choices: [] };
+  story.pages.push(page);
+  if(!story.startPageId) story.startPageId = page.id;
+  await db.write();
+  res.json(page);
+});
+
+app.put('/api/stories/:id/pages/:pageId', authMiddleware, async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.id);
+  if(!story) return res.status(404).json({ error: 'not found' });
+  if(story.authorId !== req.user.id) return res.status(403).json({ error: 'not owner' });
+  const page = story.pages.find(p => p.id === req.params.pageId);
+  if(!page) return res.status(404).json({ error: 'page not found' });
+  const { content, isEnd } = req.body;
+  if(content !== undefined) page.content = content;
+  if(isEnd !== undefined) page.isEnd = !!isEnd;
+  await db.write();
+  res.json(page);
+});
+
+app.delete('/api/stories/:id/pages/:pageId', authMiddleware, async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.id);
+  if(!story) return res.status(404).json({ error: 'not found' });
+  if(story.authorId !== req.user.id) return res.status(403).json({ error: 'not owner' });
+  const idx = story.pages.findIndex(p => p.id === req.params.pageId);
+  if(idx === -1) return res.status(404).json({ error: 'page not found' });
+  story.pages.splice(idx,1);
+  // remove choices pointing to this page
+  story.pages.forEach(p => p.choices = p.choices.filter(c => c.to !== req.params.pageId));
+  if(story.startPageId === req.params.pageId) story.startPageId = story.pages[0]?.id || null;
+  await db.write();
+  res.json({ ok: true });
+});
+
+// Choices
+app.post('/api/stories/:id/pages/:pageId/choices', authMiddleware, async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.id);
+  if(!story) return res.status(404).json({ error: 'not found' });
+  if(story.authorId !== req.user.id) return res.status(403).json({ error: 'not owner' });
+  const page = story.pages.find(p => p.id === req.params.pageId);
+  if(!page) return res.status(404).json({ error: 'page not found' });
+  const { text, to } = req.body;
+  // to should be a page id (same story)
+  if(to && !story.pages.find(p => p.id === to)) return res.status(400).json({ error: 'target page not found in this story' });
+  const choice = { id: nanoid(), text: text || '... ', to: to || null };
+  page.choices.push(choice);
+  await db.write();
+  res.json(choice);
+});
+
+app.delete('/api/stories/:id/pages/:pageId/choices/:choiceId', authMiddleware, async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.id);
+  if(!story) return res.status(404).json({ error: 'not found' });
+  if(story.authorId !== req.user.id) return res.status(403).json({ error: 'not owner' });
+  const page = story.pages.find(p => p.id === req.params.pageId);
+  if(!page) return res.status(404).json({ error: 'page not found' });
+  const idx = page.choices.findIndex(c => c.id === req.params.choiceId);
+  if(idx === -1) return res.status(404).json({ error: 'choice not found' });
+  page.choices.splice(idx,1);
+  await db.write();
+  res.json({ ok: true });
+});
+
+// --- Play endpoints ---
+app.post('/api/play/:storyId/start', authMiddleware, async (req, res) => {
+  await db.read();
+  const story = db.data.stories.find(s => s.id === req.params.storyId && s.status === 'published');
+  if(!story) return res.status(404).json({ error: 'story not available' });
+  const start = story.pages.find(p => p.id === story.startPageId);
+  if(!start) return res.status(400).json({ error: 'start page not set' });
+  res.json({ page: start });
+});
+
+app.post('/api/play/:storyId/choose', authMiddleware, async (req, res) => {
+  await db.read();
+  const { currentPageId, choiceId } = req.body;
+  const story = db.data.stories.find(s => s.id === req.params.storyId && s.status === 'published');
+  if(!story) return res.status(404).json({ error: 'story not available' });
+  const page = story.pages.find(p => p.id === currentPageId);
+  if(!page) return res.status(404).json({ error: 'page not found' });
+  const choice = page.choices.find(c => c.id === choiceId);
+  if(!choice) return res.status(404).json({ error: 'choice not found' });
+  const next = story.pages.find(p => p.id === choice.to);
+  // If next is an end, register a play if next.isEnd
+  if(next && next.isEnd){
+    db.data.plays.push({ id: nanoid(), storyId: story.id, userId: req.user.id, endPageId: next.id, createdAt: Date.now() });
+    await db.write();
+  }
+  res.json({ page: next || null });
+});
+
+// --- Minimal admin endpoints ---
+app.get('/api/admin/stats', authMiddleware, async (req, res) => {
+  await db.read();
+  // only admin emails in db.data.admins can access
+  if(!db.data.admins.some(a => a.email === req.user.email)) return res.status(403).json({ error: 'admin only' });
+  const playsByStory = {};
+  for(const p of db.data.plays){
+    playsByStory[p.storyId] = (playsByStory[p.storyId]||0)+1;
+  }
+  // Build detailed story stats
+  const storyStats = db.data.stories.map(story => ({
+    id: story.id,
+    title: story.title,
+    authorId: story.authorId,
+    status: story.status,
+    playsCount: playsByStory[story.id] || 0
+  }));
+  res.json({ storiesCount: db.data.stories.length, usersCount: db.data.users.length, playsCount: db.data.plays.length, playsByStory, storyStats });
+});
+
+app.post('/api/admin/suspend-story/:id', authMiddleware, async (req, res) => {
+  await db.read();
+  if(!db.data.admins.some(a => a.email === req.user.email)) return res.status(403).json({ error: 'admin only' });
+  const st = db.data.stories.find(s => s.id === req.params.id);
+  if(!st) return res.status(404).json({ error: 'not found' });
+  st.status = 'suspended';
+  await db.write();
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/ban-user/:id', authMiddleware, async (req, res) => {
+  await db.read();
+  if(!db.data.admins.some(a => a.email === req.user.email)) return res.status(403).json({ error: 'admin only' });
+  const user = db.data.users.find(u => u.id === req.params.id);
+  if(!user) return res.status(404).json({ error: 'user not found' });
+  user.banned = !user.banned; // Toggle ban status
+  await db.write();
+  res.json({ ok: true, banned: user.banned });
+});
+
+app.listen(PORT, ()=> console.log('NAHB backend running on', PORT));

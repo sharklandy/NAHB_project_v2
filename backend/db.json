@@ -1,0 +1,68 @@
+{
+  "users": [
+    {
+      "id": "u_admin",
+      "username": "admin",
+      "email": "admin@nahb.local",
+      "password": "<hidden>"
+    },
+    {
+      "id": "demo-author",
+      "username": "demo",
+      "email": "demo@nahb.local",
+      "password": "<hidden>"
+    }
+  ],
+  "stories": [
+    {
+      "id": "SwP1RmzPWJNljmsqFUfjp",
+      "title": "Histoire Démo",
+      "description": "Une petite histoire générée pour la démo",
+      "tags": [
+        "demo"
+      ],
+      "authorId": "demo-author",
+      "status": "published",
+      "pages": [
+        {
+          "id": "67Py6PGJGzWhNuJZZTa27",
+          "content": "Vous vous réveillez dans une forêt étrange. Deux chemins se présentent.",
+          "isEnd": false,
+          "choices": [
+            {
+              "id": "BAWYc8RtkNkwLIEP3BqJc",
+              "text": "Aller à gauche",
+              "to": "SBJ5R1pxiTE_SYc3zQbAw"
+            },
+            {
+              "id": "s5Rys2NikwWz6yuWYOtHG",
+              "text": "Aller à droite",
+              "to": "kiEOjfYNNVK3-FjOiGDiY"
+            }
+          ]
+        },
+        {
+          "id": "SBJ5R1pxiTE_SYc3zQbAw",
+          "content": "Vous suivez le chemin de gauche et trouvez un trésor. Fin.",
+          "isEnd": true,
+          "choices": []
+        },
+        {
+          "id": "kiEOjfYNNVK3-FjOiGDiY",
+          "content": "Vous suivez le chemin de droite et tombez dans une fosse. Fin.",
+          "isEnd": true,
+          "choices": []
+        }
+      ],
+      "startPageId": "67Py6PGJGzWhNuJZZTa27",
+      "createdAt": 1764084926388
+    }
+  ],
+  "plays": [],
+  "admins": [
+    {
+      "id": "adm1",
+      "email": "admin@nahb.local"
+    }
+  ]
+}
