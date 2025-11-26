@@ -1,20 +1,39 @@
-# NAHB - Not Another Hero's Book
+# NAHB - Plateforme d'Histoires Interactives
 
-## 🚀 Quick Start avec Docker
+Plateforme web de création et de lecture d'histoires à embranchements multiples avec système d'administration complet.
+
+## 🚀 Technologies
+
+- **Frontend**: React (port 3000)
+- **Backend**: Node.js/Express (port 4000)  
+- **Base de données**: MongoDB
+- **Containerisation**: Docker Compose
+
+## 📦 Installation et Démarrage
 
 ### Prérequis
 - Docker Desktop installé et démarré
 - Ports 3000, 4000 et 27017 disponibles
+- Git
 
-### Lancement
+### Lancement du projet
+
 ```bash
-docker-compose up --build
+# Cloner le repository
+git clone <votre-repo-url>
+cd NAHB_project_v2
+
+# Démarrer les conteneurs
+docker-compose up -d
+
+# Rebuild complet (si nécessaire)
+docker-compose up -d --build
 ```
 
-Ensuite :
-- **Frontend** : http://localhost:3000
-- **Backend API** : http://localhost:4000/api
-- **MongoDB** : localhost:27017
+L'application sera accessible sur:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:4000
+- **MongoDB**: localhost:27017
 
 ### Arrêt
 ```bash
@@ -28,85 +47,132 @@ docker-compose down -v
 
 ---
 
-## 📦 Architecture
+## 👥 Comptes de Démonstration
+
+### Compte Administrateur
+- **Email**: admin@nahb.local
+- **Mot de passe**: admin123
+
+### Compte Utilisateur Démo (avec histoire complète)
+- **Email**: pierre@nahb.local
+- **Mot de passe**: pierre123
+- **Histoire**: "La Quête du Dragon Oublié" (26 pages, 4 victoires, 4 game overs)
+
+---
+
+## 🗂️ Structure du Projet
 
 ```
 NAHB_project_v2/
-├── docker-compose.yml          # Orchestration Docker
-├── backend/
-│   ├── Dockerfile
-│   ├── index.js                # API Express + MongoDB
-│   ├── init-mongo.js           # Script d'initialisation MongoDB
+├── backend/              # API Node.js/Express
+│   ├── models/          # Modèles Mongoose (Story, User, Admin, Play)
+│   ├── index.js         # Point d'entrée backend avec tous les endpoints
+│   ├── init-mongo.js    # Script d'initialisation MongoDB
 │   ├── package.json
-│   └── models/
-│       ├── User.js             # Schéma utilisateur
-│       ├── Story.js            # Schéma histoire
-│       ├── Play.js             # Schéma partie jouée
-│       └── Admin.js            # Schéma administrateur
-└── frontend/
-    ├── Dockerfile
-    ├── package.json
-    └── src/
-        └── components/
+│   └── Dockerfile
+├── frontend/            # Application React
+│   ├── src/
+│   │   ├── components/  # Composants React
+│   │   │   ├── Editor.js       # Éditeur d'histoires
+│   │   │   ├── PlayView.js     # Lecteur d'histoires
+│   │   │   ├── AdminPanel.js   # Panneau admin
+│   │   │   ├── StoryList.js    # Liste des histoires
+│   │   │   ├── Login.js        # Authentification
+│   │   │   └── Register.js     # Inscription
+│   │   └── App.js
+│   ├── package.json
+│   └── Dockerfile
+├── scripts/             # Scripts utilitaires MongoDB
+└── docker-compose.yml   # Configuration Docker
 ```
 
 ---
 
-## 🗄️ Base de données MongoDB
+## 🔧 Commandes Utiles
 
-### Configuration
-- **User** : admin
-- **Password** : admin123
-- **Database** : nahb
-
-### Collections
-- `users` : Utilisateurs (auteurs/lecteurs)
-- `stories` : Histoires interactives
-- `plays` : Parties jouées
-- `admins` : Liste des administrateurs
-
-### Connexion directe
+### Docker
 ```bash
-mongosh mongodb://admin:admin123@localhost:27017/nahb?authSource=admin
+# Arrêter les conteneurs
+docker-compose down
+
+# Voir les logs en temps réel
+docker logs -f nahb-frontend
+docker logs -f nahb-backend
+
+# Restart d'un service spécifique
+docker-compose restart backend
+docker-compose restart frontend
+```
+
+### Base de données
+```bash
+# Se connecter à MongoDB
+docker exec -it nahb-mongo mongosh nahb_stories
+
+# Exécuter un script d'initialisation
+docker exec -i nahb-mongo mongosh nahb_stories < scripts/create_admin.js
 ```
 
 ---
 
-## 🎯 Fonctionnalités implémentées
+## 🎮 Fonctionnalités
 
-### ✅ Authentification
-- Inscription avec email/mot de passe
-- Connexion/déconnexion
-- JWT pour les sessions
+### Pour les Utilisateurs
+- ✍️ Création d'histoires interactives avec pages et choix multiples
+- 📖 Lecture d'histoires publiées
+- 🔄 Navigation dans les embranchements
+- 👤 Gestion de profil
+- 💾 Enregistrement automatique des parties
 
-### ✅ Gestion des histoires (Auteur)
-- Créer/modifier/supprimer ses histoires
-- Statuts : brouillon, publié, suspendu
-- Gestion des pages/scènes avec choix multiples
-- Définir page de départ et fins
-
-### ✅ Lecture d'histoires (Lecteur)
-- Liste des histoires publiées
-- Recherche par titre/description/tags
-- Navigation interactive avec choix
-- Enregistrement automatique des parties terminées
-
-### ✅ Administration
-- Voir les statistiques globales
-- Bannir/débannir des utilisateurs
-- Suspendre des histoires
-- Détails par histoire (nombre de parties jouées)
+### Pour les Administrateurs
+- 📊 Panneau d'administration complet
+- 👁️ Visualisation de toutes les histoires
+- ⏸️ Suspension/Réactivation d'histoires
+- 🗑️ Suppression d'histoires
+- 👥 Gestion des utilisateurs (bannissement)
+- 📈 Statistiques globales
 
 ---
 
-## 🔧 Développement local (sans Docker)
+## 📝 API Endpoints
+
+### Authentification
+- `POST /api/register` - Inscription (email, password, username)
+- `POST /api/login` - Connexion (retourne JWT token)
+
+### Histoires (authentification requise)
+- `GET /api/stories` - Liste des histoires publiées
+- `GET /api/stories/:id` - Détails d'une histoire
+- `POST /api/stories` - Créer une nouvelle histoire
+- `PUT /api/stories/:id` - Modifier une histoire (auteur uniquement)
+- `POST /api/stories/:id/pages` - Ajouter une page
+- `PUT /api/stories/:id/pages/:pageId` - Modifier une page
+- `DELETE /api/stories/:id/pages/:pageId` - Supprimer une page
+- `POST /api/stories/:id/pages/:pageId/choices` - Ajouter un choix
+- `DELETE /api/stories/:id/pages/:pageId/choices/:choiceId` - Supprimer un choix
+
+### Lecture
+- `POST /api/play/:storyId/start` - Commencer une histoire
+- `POST /api/play/:storyId/choose` - Faire un choix
+
+### Administration (auth admin requise)
+- `GET /api/admin/stats` - Statistiques globales
+- `GET /api/admin/stories` - Toutes les histoires (tous statuts)
+- `POST /api/admin/suspend-story/:id` - Suspendre une histoire
+- `POST /api/admin/unsuspend-story/:id` - Réactiver une histoire
+- `POST /api/admin/delete-story/:id` - Supprimer une histoire
+- `POST /api/admin/ban-user/:id` - Bannir/débannir un utilisateur
+
+---
+
+## 🛠️ Développement Local (sans Docker)
 
 ### Backend
 ```bash
 cd backend
 npm install
-export MONGODB_URI="mongodb://admin:admin123@localhost:27017/nahb?authSource=admin"
-export JWT_SECRET="dev_secret_change_me"
+export MONGODB_URI="mongodb://localhost:27017/nahb_stories"
+export JWT_SECRET="votre_secret_jwt"
 npm start
 ```
 
@@ -114,70 +180,64 @@ npm start
 ```bash
 cd frontend
 npm install
-export REACT_APP_API="http://localhost:4000/api"
 npm start
 ```
 
 ---
 
-## 📝 API Endpoints
+## 📜 Historique du Projet
 
-### Auth
-- `POST /api/auth/register` - Inscription
-- `POST /api/auth/login` - Connexion
+### Fonctionnalités Développées
+- ✅ Transformation MongoDB `_id` → `id` pour compatibilité frontend
+- ✅ Éditeur d'histoires avec gestion des pages et choix multiples
+- ✅ Système de lecture avec navigation interactive
+- ✅ Panneau d'administration complet
+- ✅ Suspension/Réactivation/Suppression d'histoires
+- ✅ Contournement des blocages DELETE (extension navigateur) via POST
+- ✅ Création d'histoires de démonstration complexes
+- ✅ Gestion des utilisateurs et bannissement
 
-### Stories
-- `GET /api/stories?published=1&q=search` - Liste des histoires
-- `POST /api/stories` - Créer une histoire
-- `PUT /api/stories/:id` - Modifier
-- `DELETE /api/stories/:id` - Supprimer
-
-### Pages & Choices
-- `POST /api/stories/:id/pages` - Ajouter une page
-- `PUT /api/stories/:id/pages/:pageId` - Modifier une page
-- `DELETE /api/stories/:id/pages/:pageId` - Supprimer une page
-- `POST /api/stories/:id/pages/:pageId/choices` - Ajouter un choix
-- `DELETE /api/stories/:id/pages/:pageId/choices/:choiceId` - Supprimer un choix
-
-### Play
-- `POST /api/play/:storyId/start` - Commencer une histoire
-- `POST /api/play/:storyId/choose` - Faire un choix
-
-### Admin
-- `GET /api/admin/stats` - Statistiques globales
-- `POST /api/admin/suspend-story/:id` - Suspendre une histoire
-- `POST /api/admin/ban-user/:id` - Bannir/débannir un utilisateur
+### Corrections Techniques
+- 🔧 Gestion unifiée des champs `id` vs `_id` MongoDB
+- 🔧 Correction des références d'ID dans tous les composants
+- 🔧 Suppression des caractères parasites dans l'interface
+- 🔧 Création de comptes demo avec histoires complètes
+- 🔧 Rebuild Docker pour intégration des nouvelles fonctionnalités
 
 ---
 
-## 🧪 Compte admin par défaut
-- **Email** : admin@nahb.local
-- **Mot de passe** : Créer le compte via `/api/auth/register`
+## 📦 Technologies Détaillées
+
+### Backend
+- **Node.js** avec Express
+- **MongoDB** avec Mongoose (ODM)
+- **JWT** pour l'authentification
+- **bcrypt** pour le hashing des mots de passe
+
+### Frontend
+- **React** (Create React App)
+- **React Router** pour la navigation
+- **Fetch API** pour les requêtes HTTP
+
+### DevOps
+- **Docker** & **Docker Compose**
+- Multi-stage builds pour optimisation
 
 ---
 
-## 📊 Présentation
-- **Date** : Vendredi
-- **Durée** : 15-20 minutes + 5min QA + 5min debrief
-- **Rendu** : Dimanche 30/11 23h55 sur César
+## 🗄️ Base de Données MongoDB
 
----
+### Configuration
+- **Database**: nahb_stories
+- **Collections**: users, stories, plays, admins
 
-## 🛠️ Technologies utilisées
-- **Backend** : Node.js, Express, MongoDB, Mongoose, JWT, bcrypt
-- **Frontend** : React
-- **DevOps** : Docker, Docker Compose
-- **Base de données** : MongoDB 7.0
-
----
-
-## 📦 Rendu final
+### Connexion Directe
 ```bash
-# Créer l'archive pour le rendu
-tar -czf NAHB_project.tar.gz NAHB_project_v2/
+mongosh mongodb://localhost:27017/nahb_stories
 ```
 
-Ou sur Windows (PowerShell) :
-```powershell
-Compress-Archive -Path NAHB_project_v2 -DestinationPath NAHB_project.zip
-```
+---
+
+## 📄 License
+
+Projet développé pour NAHB.
