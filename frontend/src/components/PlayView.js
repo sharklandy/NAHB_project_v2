@@ -43,7 +43,7 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     const res = await fetch(api + '/stories/' + id);
     const story = await res.json();
     setStoryTitle(story.title || 'Histoire');
-    setStoryTheme(story.theme || 'Fantasy');
+    setStoryTheme(story.theme || 'fantasy');
     
     // Load unlocked endings
     loadUnlockedEndings(id);
@@ -125,7 +125,7 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   
   // Déterminer la classe de thème
   const getThemeClass = () => {
-    if (storyTheme === 'Fantasy' && userThemeMode === 'light') {
+    if ((storyTheme === 'Fantasy' || storyTheme === 'fantasy') && userThemeMode === 'light') {
       return 'theme-fantasy-light';
     }
     // Ajouter d'autres thèmes ici plus tard
@@ -135,7 +135,7 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   return (
     <div className={`play-view-container ${getThemeClass()}`}>
       {/* Éléments de décor pour fantasy-light */}
-      {storyTheme === 'Fantasy' && userThemeMode === 'light' && (
+      {(storyTheme === 'Fantasy' || storyTheme === 'fantasy') && userThemeMode === 'light' && (
         <div className="theme-background-fantasy-light">
           <div className="fantasy-bg-layer"></div>
           <div className="fantasy-tower"></div>

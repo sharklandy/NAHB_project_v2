@@ -18,7 +18,7 @@ async function createGardienStory(token) {
         title: 'L\'Eveil du Dernier\nGardien',
         description: 'Une aventure épique où vous incarnez le dernier gardien d\'un sanctuaire ancien, chargé de protéger le monde des forces obscures qui menacent de s\'échapper.',
         tags: ['fantasy', 'aventure', 'gardien', 'épique'],
-        theme: 'Fantasy'
+        theme: 'fantasy'
       })
     });
     
@@ -273,7 +273,7 @@ async function createDragonStory(token) {
         title: 'La Quête du Dragon Oublié',
         description: 'Une aventure fantastique épique où vous devez retrouver un dragon légendaire pour sauver votre village des forces du mal',
         tags: ['fantasy', 'dragon', 'aventure', 'épique'],
-        theme: 'Fantasy'
+        theme: 'fantasy'
       })
     });
     
@@ -475,7 +475,7 @@ async function createAtlantisStory(token) {
         title: 'Le Mystère de la Cité Engloutie',
         description: 'Une aventure sous-marine où vous incarnez un explorateur à la recherche d\'Atlantis',
         tags: ['aventure', 'mystere', 'ocean'],
-        theme: 'Science-Fiction'
+        theme: 'ocean'
       })
     });
     

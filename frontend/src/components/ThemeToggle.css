@@ -1,31 +1,32 @@
+/* ==================== THEME TOGGLE BUTTON ==================== */
 .theme-toggle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   padding: 0;
   flex-shrink: 0;
+  box-shadow: none;
 }
 
 .theme-toggle:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  background: var(--accent-hover);
+  transform: scale(1.05);
 }
 
 .theme-toggle:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 .theme-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
@@ -34,121 +35,145 @@
   transform: rotate(20deg);
 }
 
-/* Dark theme styles */
+/* ==================== DARK MODE THEME ==================== */
 body.dark-theme {
-  background: #1a1a2e;
-  color: #eee;
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  
+  --accent-primary: #6366f1;
+  --accent-secondary: #8b5cf6;
+  --accent-hover: #5457d4;
+  
+  --border-color: #334155;
+  --border-focus: #6366f1;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 body.dark-theme header {
-  background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  border-bottom-color: var(--border-color);
 }
 
-body.dark-theme button:not(.theme-toggle) {
-  background: linear-gradient(135deg, #533483 0%, #764ba2 100%);
+/* Form inputs in dark mode */
+body.dark-theme input[type="text"],
+body.dark-theme input[type="email"],
+body.dark-theme input[type="password"],
+body.dark-theme textarea,
+body.dark-theme select {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
+body.dark-theme input[type="text"]:focus,
+body.dark-theme input[type="email"]:focus,
+body.dark-theme input[type="password"]:focus,
+body.dark-theme textarea:focus,
+body.dark-theme select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+body.dark-theme input[type="text"]::placeholder,
+body.dark-theme input[type="email"]::placeholder,
+body.dark-theme input[type="password"]::placeholder,
+body.dark-theme textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Tables in dark mode */
+body.dark-theme tbody tr:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Component-specific dark mode styles */
 body.dark-theme .story-card,
 body.dark-theme .story-page,
 body.dark-theme .story-header,
 body.dark-theme .my-review-card,
 body.dark-theme .no-reviews,
-body.dark-theme .no-stories {
-  background: #16213e;
-  color: #eee;
+body.dark-theme .no-stories,
+body.dark-theme .auth-card,
+body.dark-theme .story-form,
+body.dark-theme .admin-content,
+body.dark-theme .rating-section,
+body.dark-theme .review-item {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
 }
 
-body.dark-theme .story-card h3,
-body.dark-theme .story-page h3,
-body.dark-theme .story-header h2,
-body.dark-theme .my-review-card h3 {
-  color: #eee;
+body.dark-theme .story-card:hover,
+body.dark-theme .my-review-card:hover {
+  background: var(--bg-tertiary);
 }
 
-body.dark-theme .story-card p,
-body.dark-theme .story-content {
-  color: #ccc;
+body.dark-theme .story-theme-badge,
+body.dark-theme .story-tag {
+  background: var(--accent-primary);
+}
+
+body.dark-theme .theme-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+body.dark-theme .theme-btn:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+}
+
+body.dark-theme .theme-btn.active {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
 }
 
 body.dark-theme .choice-button {
-  background: #16213e;
-  color: #eee;
-  border-color: #667eea;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
 }
 
 body.dark-theme .choice-button:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent-primary);
   color: white;
 }
 
 body.dark-theme .story-rating {
-  background: rgba(102, 126, 234, 0.2);
-}
-
-body.dark-theme .review-comment-text {
-  background: #0f3460;
-  color: #ccc;
-}
-
-body.dark-theme .edit-form {
-  background: #0f3460;
-}
-
-body.dark-theme .edit-comment textarea {
-  background: #16213e;
-  color: #eee;
-  border-color: #667eea;
+  background: rgba(99, 102, 241, 0.15);
 }
 
 body.dark-theme .select-message,
 body.dark-theme .loading-message {
-  background: rgba(22, 33, 62, 0.95);
-  color: #eee;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
-body.dark-theme .review-item {
-  background: #16213e;
-  border-left-color: #667eea;
-}
-
-body.dark-theme .review-comment {
-  color: #ccc;
+body.dark-theme .error-message {
+  color: #f87171;
 }
 
 /* Search bar in dark mode */
 body.dark-theme .search-bar input {
-  background: #16213e;
-  color: #eee;
-  border-color: #667eea;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
-body.dark-theme .search-bar input::placeholder {
-  color: #888;
-}
-
-/* Theme filter buttons in dark mode */
-body.dark-theme .theme-btn {
-  background: #16213e;
-  color: #667eea;
-  border-color: #667eea;
-}
-
-body.dark-theme .theme-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-/* Admin panel in dark mode */
-body.dark-theme .admin-container,
-body.dark-theme .admin-stats,
-body.dark-theme .report-item {
-  background: #16213e;
-}
-
-body.dark-theme .admin-container h2 {
-  color: #eee;
-}
-
-body.dark-theme .stat-value {
-  color: #667eea;
+/* Fantasy theme compatibility - preserve background animations */
+.theme-fantasy-light .story-header,
+.theme-fantasy-light .story-page,
+.theme-fantasy-light .select-message,
+.theme-fantasy-light .loading-message {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
 }
