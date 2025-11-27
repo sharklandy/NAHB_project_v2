@@ -8,6 +8,7 @@ import PlayView from './components/PlayView';
 import Editor from './components/Editor';
 import AdminPanel from './components/AdminPanel';
 import MyReviews from './components/MyReviews';
+import ThemeToggle from './components/ThemeToggle';
 
 const API = process.env.REACT_APP_API || 'http://localhost:4000/api';
 
@@ -42,7 +43,10 @@ function App(){
     <Router>
       <div>
         <header>
-          <h1>NAHB</h1>
+          <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+            <h1>NAHB</h1>
+            <ThemeToggle />
+          </div>
           <nav>
             {token && (
               <>
