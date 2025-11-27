@@ -286,7 +286,7 @@ function AdminPanel({ api, token }) {
     return (
       <div>
         <h2>Panneau Administrateur</h2>
-        <p style={{color: 'red'}}>{error}</p>
+        <p className="admin-error">{error}</p>
       </div>
     );
   }
@@ -295,17 +295,17 @@ function AdminPanel({ api, token }) {
     <div>
       <h2>Panneau Administrateur</h2>
       
-      <nav style={{marginBottom: '20px'}}>
-        <button onClick={() => setView('dashboard')} style={{marginRight: '10px', fontWeight: view === 'dashboard' ? 'bold' : 'normal'}}>
+      <nav className="admin-nav">
+        <button className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} onClick={() => setView('dashboard')}>
           📊 Dashboard
         </button>
-        <button onClick={() => setView('users')} style={{marginRight: '10px', fontWeight: view === 'users' ? 'bold' : 'normal'}}>
+        <button className={`nav-btn ${view === 'users' ? 'active' : ''}`} onClick={() => setView('users')}>
           👥 Utilisateurs ({users.length})
         </button>
-        <button onClick={() => setView('stories')} style={{marginRight: '10px', fontWeight: view === 'stories' ? 'bold' : 'normal'}}>
+        <button className={`nav-btn ${view === 'stories' ? 'active' : ''}`} onClick={() => setView('stories')}>
           📚 Histoires ({stories.length})
         </button>
-        <button onClick={() => setView('reports')} style={{fontWeight: view === 'reports' ? 'bold' : 'normal'}}>
+        <button className={`nav-btn ${view === 'reports' ? 'active' : ''}`} onClick={() => setView('reports')}>
           🚨 Signalements ({reports.filter(r => r.status === 'pending').length})
         </button>
       </nav>
@@ -313,29 +313,29 @@ function AdminPanel({ api, token }) {
       {view === 'dashboard' && stats && (
         <div>
           <h3>📊 Statistiques Globales</h3>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px'}}>
-            <div style={{border: '1px solid #ccc', padding: '15px', borderRadius: '5px'}}>
+          <div className="stats-grid three-columns">
+            <div className="info-card">
               <h4>👥 Utilisateurs</h4>
-              <p style={{fontSize: '24px', margin: '10px 0'}}>{stats.usersCount}</p>
+              <p className="stat-number">{stats.usersCount}</p>
               <p>✅ Actifs: {stats.activeUsers}</p>
               <p>🚫 Bannis: {stats.bannedUsers}</p>
             </div>
-            <div style={{border: '1px solid #ccc', padding: '15px', borderRadius: '5px'}}>
+            <div className="info-card">
               <h4>📚 Histoires</h4>
-              <p style={{fontSize: '24px', margin: '10px 0'}}>{stats.storiesCount}</p>
+              <p className="stat-number">{stats.storiesCount}</p>
               <p>📖 Publiées: {stats.publishedStories}</p>
               <p>✏️ Brouillons: {stats.draftStories}</p>
               <p>⛔ Suspendues: {stats.suspendedStories}</p>
             </div>
-            <div style={{border: '1px solid #ccc', padding: '15px', borderRadius: '5px'}}>
+            <div className="info-card">
               <h4>🎮 Parties</h4>
-              <p style={{fontSize: '24px', margin: '10px 0'}}>{stats.playsCount}</p>
+              <p className="stat-number">{stats.playsCount}</p>
               <p>Total de parties jouées</p>
             </div>
           </div>
 
           <h3>🏆 Histoires les plus jouées</h3>
-          <table border="1" cellPadding="10" style={{width: '100%', marginTop: '10px'}}>
+          <table className="admin-table" border="1" cellPadding="10">
             <thead>
               <tr>
                 <th>Titre</th>
@@ -362,7 +362,7 @@ function AdminPanel({ api, token }) {
       {view === 'users' && (
         <div>
           <h3>👥 Gestion des Utilisateurs</h3>
-          <table border="1" cellPadding="10" style={{width: '100%'}}>
+          <table className="admin-table" border="1" cellPadding="10">
             <thead>
               <tr>
                 <th>Username</th>
@@ -377,7 +377,7 @@ function AdminPanel({ api, token }) {
             </thead>
             <tbody>
               {users.map(user => (
-                <tr key={user._id} style={{backgroundColor: user.banned ? '#ffe6e6' : 'white'}}>
+                <tr key={user._id} className={`admin-row ${user.banned ? 'banned' : ''}`}>
                   <td>{user.username}</td>
                   <td>{user.email}</td>
                   <td>{formatDate(user.createdAt)}</td>
@@ -394,16 +394,14 @@ function AdminPanel({ api, token }) {
                         👁️ Détails
                       </button>
                       <button 
-                        className="btn-small"
+                        className={`btn-small ${user.banned ? 'btn-info' : 'btn-warning'}`}
                         onClick={() => toggleBanUser(user._id, user.banned)} 
-                        style={{ backgroundColor: user.banned ? '#90EE90' : '#FFB6C1' }}
                       >
                         {user.banned ? '✅ Débannir' : '🚫 Bannir'}
                       </button>
                       <button 
-                        className="btn-small"
+                        className="btn-small btn-danger"
                         onClick={() => deleteUser(user._id)}
-                        style={{ backgroundColor: '#ff4444', color: 'white' }}
                       >
                         🗑️ Supprimer
                       </button>
@@ -418,10 +416,10 @@ function AdminPanel({ api, token }) {
 
       {view === 'userDetail' && userDetails && (
         <div>
-          <button onClick={() => setView('users')} style={{marginBottom: '20px'}}>← Retour à la liste</button>
+          <button className="back-button" onClick={() => setView('users')}>← Retour à la liste</button>
           
           <h3>👤 Détails de l'utilisateur</h3>
-          <div style={{border: '1px solid #ccc', padding: '20px', marginBottom: '20px'}}>
+          <div className="card mb-20">
             <p><strong>Username:</strong> {userDetails.user.username}</p>
             <p><strong>Email:</strong> {userDetails.user.email}</p>
             <p><strong>Statut:</strong> {userDetails.user.banned ? '🚫 Banni' : '✅ Actif'}</p>
@@ -432,7 +430,7 @@ function AdminPanel({ api, token }) {
           </div>
 
           <h4>📚 Histoires créées ({userDetails.stories.length})</h4>
-          <table border="1" cellPadding="10" style={{width: '100%', marginBottom: '20px'}}>
+          <table className="admin-table mb-20" border="1" cellPadding="10">
             <thead>
               <tr>
                 <th>Titre</th>
@@ -453,16 +451,16 @@ function AdminPanel({ api, token }) {
             </tbody>
           </table>
 
-          <div style={{marginTop: '20px'}}>
+          <div className="user-actions">
             <button 
+              className={`btn-primary ${userDetails.user.banned ? 'btn-info' : 'btn-warning'} mr-10`} 
               onClick={() => toggleBanUser(userDetails.user._id, userDetails.user.banned)}
-              style={{marginRight: '10px', padding: '10px 20px', backgroundColor: userDetails.user.banned ? '#90EE90' : '#FFB6C1'}}
             >
               {userDetails.user.banned ? '✅ Débannir cet utilisateur' : '🚫 Bannir cet utilisateur'}
             </button>
             <button 
+              className="btn-danger"
               onClick={() => deleteUser(userDetails.user._id)}
-              style={{padding: '10px 20px', backgroundColor: '#ff4444', color: 'white'}}
             >
               🗑️ Supprimer cet utilisateur
             </button>
@@ -473,7 +471,7 @@ function AdminPanel({ api, token }) {
       {view === 'stories' && (
         <div>
           <h3>📚 Gestion des Histoires</h3>
-          <table border="1" cellPadding="10" style={{width: '100%'}}>
+          <table className="admin-table" border="1" cellPadding="10">
             <thead>
               <tr>
                 <th>Titre</th>
@@ -485,7 +483,7 @@ function AdminPanel({ api, token }) {
             </thead>
             <tbody>
               {stories.map(story => (
-                <tr key={story._id} style={{backgroundColor: story.status === 'suspended' ? '#ffe6e6' : 'white'}}>
+                <tr key={story._id} className={`admin-row ${story.status === 'suspended' ? 'suspended' : ''}`}>
                   <td>{story.title}</td>
                   <td>{story.authorId}</td>
                   <td>{story.status}</td>
@@ -494,7 +492,7 @@ function AdminPanel({ api, token }) {
                     <div className="action-buttons">
                       {story.status !== 'suspended' && (
                         <button 
-                          className="btn-small"
+                          className="btn-small btn-warning"
                           onClick={() => suspendStory(story.id || story._id)}
                         >
                           ⛔ Suspendre
@@ -502,17 +500,15 @@ function AdminPanel({ api, token }) {
                       )}
                       {story.status === 'suspended' && (
                         <button 
-                          className="btn-small"
+                          className="btn-small btn-success"
                           onClick={() => unsuspendStory(story.id || story._id)}
-                          style={{backgroundColor: '#28a745', color: 'white'}}
                         >
                           ✅ Remettre en ligne
                         </button>
                       )}
                       <button 
-                        className="btn-small"
+                        className="btn-small btn-danger ml-5"
                         onClick={() => deleteStory(story.id || story._id)}
-                        style={{ backgroundColor: '#ff4444', color: 'white', marginLeft: '5px' }}
                       >
                         🗑️ Supprimer
                       </button>
@@ -542,7 +538,7 @@ function AdminPanel({ api, token }) {
             <tbody>
               {reports.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>
+                  <td colSpan="6" className="empty-cell">
                     Aucun signalement
                   </td>
                 </tr>
@@ -565,52 +561,22 @@ function AdminPanel({ api, token }) {
                         </span>
                       </td>
                       <td>
-                        <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+                        <div className="report-actions">
                           {report.status === 'pending' && (
                             <>
-                              <button
-                                onClick={() => updateReportStatus(report.id, 'reviewed')}
-                                style={{ backgroundColor: '#007bff', color: 'white' }}
-                              >
-                                👁️ En révision
-                              </button>
-                              <button
-                                onClick={() => updateReportStatus(report.id, 'resolved')}
-                                style={{ backgroundColor: '#28a745', color: 'white' }}
-                              >
-                                ✅ Résolu
-                              </button>
-                              <button
-                                onClick={() => updateReportStatus(report.id, 'dismissed')}
-                                style={{ backgroundColor: '#6c757d', color: 'white' }}
-                              >
-                                ❌ Rejeter
-                              </button>
+                              <button className="btn-primary" onClick={() => updateReportStatus(report.id, 'reviewed')}>👁️ En révision</button>
+                              <button className="btn-success" onClick={() => updateReportStatus(report.id, 'resolved')}>✅ Résolu</button>
+                              <button className="btn-secondary" onClick={() => updateReportStatus(report.id, 'dismissed')}>❌ Rejeter</button>
                             </>
                           )}
                           {report.status === 'reviewed' && (
                             <>
-                              <button
-                                onClick={() => updateReportStatus(report.id, 'resolved')}
-                                style={{ backgroundColor: '#28a745', color: 'white' }}
-                              >
-                                ✅ Résolu
-                              </button>
-                              <button
-                                onClick={() => updateReportStatus(report.id, 'dismissed')}
-                                style={{ backgroundColor: '#6c757d', color: 'white' }}
-                              >
-                                ❌ Rejeter
-                              </button>
+                              <button className="btn-success" onClick={() => updateReportStatus(report.id, 'resolved')}>✅ Résolu</button>
+                              <button className="btn-secondary" onClick={() => updateReportStatus(report.id, 'dismissed')}>❌ Rejeter</button>
                             </>
                           )}
                           {report.storyId && (
-                            <button
-                              onClick={() => suspendStory(report.storyId.id || report.storyId._id)}
-                              style={{ backgroundColor: '#ff9800', color: 'white' }}
-                            >
-                              🚫 Suspendre l'histoire
-                            </button>
+                            <button className="btn-warning" onClick={() => suspendStory(report.storyId.id || report.storyId._id)}>🚫 Suspendre l'histoire</button>
                           )}
                         </div>
                       </td>

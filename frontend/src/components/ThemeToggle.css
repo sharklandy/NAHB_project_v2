@@ -158,6 +158,18 @@ body.dark-theme .loading-message {
   color: var(--text-primary);
 }
 
+/* Admin table row dark-mode overrides */
+body.dark-theme .admin-row {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+body.dark-theme .admin-row.banned,
+body.dark-theme .admin-row.suspended {
+  /* subtle red tint in dark mode to indicate flagged rows without losing contrast */
+  background: rgba(220, 38, 38, 0.06);
+}
+
 body.dark-theme .error-message {
   color: #f87171;
 }

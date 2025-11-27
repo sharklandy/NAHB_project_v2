@@ -114,6 +114,120 @@
   margin-top: var(--spacing-lg);
 }
 
+/* Row classes for admin tables - use classes instead of inline colors so dark theme works */
+.admin-row {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.admin-row.banned {
+  /* light red for banned users in light mode */
+  background: #fff1f2;
+}
+.admin-row.suspended {
+  /* light red for suspended stories in light mode */
+  background: #fff1f2;
+}
+
+.admin-error {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.admin-nav {
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-sm);
+}
+.admin-nav .nav-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+}
+.admin-nav .nav-btn.active {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.three-columns {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 30px;
+}
+
+.info-card {
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+.stat-number {
+  font-size: 24px;
+  margin: 10px 0;
+  font-weight: 700;
+}
+
+.admin-table {
+  width: 100%;
+}
+
+.user-actions {
+  margin-top: 20px;
+}
+
+.mb-20 { margin-bottom: 20px; }
+.mr-10 { margin-right: 10px; }
+.ml-5 { margin-left: 5px; }
+
+/* Reports table styles */
+.empty-cell {
+  text-align: center;
+  padding: 20px;
+}
+
+.report-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Button utility classes */
+.btn-success {
+  background: #28a745;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+}
+.btn-success:hover { background: #1e7e34; }
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+}
+.btn-secondary:hover { background: #5a6268; }
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+/* small button variants used in tables */
+.btn-small.btn-success { padding: 6px 8px; border-radius: 6px; }
+.btn-small.btn-warning { background: #f59e0b; color: white; }
+.btn-small.btn-warning:hover { background: #d97706; }
+
+
 table {
   width: 100%;
   border-collapse: collapse;

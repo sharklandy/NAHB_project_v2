@@ -5,7 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import StoryList from './components/StoryList';
 import PlayView from './components/PlayView';
-import Editor from './components/Editor';
+import EditorV2 from './components/EditorV2';
 import AdminPanel from './components/AdminPanel';
 import MyReviews from './components/MyReviews';
 import ThemeToggle from './components/ThemeToggle';
@@ -104,7 +104,7 @@ function App(){
           ) : (
             <Routes>
               <Route path="/" element={<StoryListWrapper api={API} token={token} />} />
-              <Route path="/editor" element={<Editor api={API} token={token} user={user} />} />
+              <Route path="/editor" element={<EditorV2 api={API} token={token} user={user} />} />
               <Route path="/my-reviews" element={<MyReviews />} />
               <Route path="/play/:storyId" element={<PlayViewWrapper api={API} token={token} />} />
               <Route path="/play" element={<Navigate to="/" replace />} />

@@ -46,18 +46,19 @@ async function getStoryById(storyId) {
 /**
  * Create a new story
  */
-async function createStory(authorId, title, description, tags) {
+async function createStory(authorId, title, description, tags, theme) {
   const story = await Story.create({
     title: title || 'Untitled',
     description: description || '',
     tags: tags || [],
+    theme: theme || '',
     authorId,
     status: 'draft',
     pages: [],
     startPageId: null
   });
   
-  console.log('Created story with _id:', story._id, 'toJSON:', story.toJSON());
+  console.log('Created story with _id:', story._id, 'theme:', story.theme, 'toJSON:', story.toJSON());
   return story.toJSON();
 }
 

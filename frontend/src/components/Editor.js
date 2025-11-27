@@ -61,7 +61,26 @@ export default function Editor({ api, token, user }){
   }
 
   async function createStory(){
-    const res = await fetch(api + '/stories', { method:'POST', headers: {'Content-Type':'application/json', Authorization: 'Bearer '+token}, body: JSON.stringify({ title, description: desc, theme })});
+    if (!title.trim()) {
+      alert('Le titre est requis');
+      return;
+    }
+    if (!theme) {
+      alert('Veuillez sélectionner un thème');
+      return;
+    }
+    const res = await fetch(api + '/stories', { 
+      method:'POST', 
+      headers: {
+        'Content-Type':'application/json', 
+        Authorization: 'Bearer '+token
+      }, 
+      body: JSON.stringify({ 
+        title, 
+        description: desc, 
+        theme: theme // Ajout explicite du thème
+      })
+    });
     const j = await res.json();
     setStories([j, ...stories]);
     setTitle(''); setDesc(''); setTheme('');

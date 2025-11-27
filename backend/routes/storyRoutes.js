@@ -43,8 +43,8 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { title, description, tags } = req.body;
-    const story = await storyService.createStory(req.user.id, title, description, tags);
+    const { title, description, tags, theme } = req.body;
+    const story = await storyService.createStory(req.user.id, title, description, tags, theme);
     res.json(story);
   } catch (err) {
     res.status(500).json({ error: err.message });
