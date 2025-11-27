@@ -21,25 +21,21 @@ export default function Editor({ api, token, user }){
   const [theme, setTheme] = useState('');
   const [pageContent, setPageContent] = useState('');
   const [isEnd, setIsEnd] = useState(false);
+  const [endLabel, setEndLabel] = useState('');
   const [editingPage, setEditingPage] = useState(null);
   const [error, setError] = useState(null);
   
   // Liste des thèmes disponibles
   const availableThemes = [
-    'Fantasy',
-    'Science-Fiction',
-    'Horreur',
-    'Mystère',
-    'Romance',
-    'Aventure',
-    'Historique',
-    'Contemporain',
-    'Post-apocalyptique',
-    'Cyberpunk',
-    'Steampunk',
-    'Thriller',
-    'Comédie',
-    'Drame'
+    { value: 'fantasy', label: 'Fantasy' },
+    { value: 'sci-fi', label: 'Science-Fiction' },
+    { value: 'horror', label: 'Horreur' },
+    { value: 'mystery', label: 'Mystère' },
+    { value: 'romance', label: 'Romance' },
+    { value: 'adventure', label: 'Aventure' },
+    { value: 'historical', label: 'Historique' },
+    { value: 'comedy', label: 'Comédie' },
+    { value: 'ocean', label: 'Océan' }
   ];
 
   useEffect(()=> { load(); }, []);
@@ -90,7 +86,18 @@ export default function Editor({ api, token, user }){
     try{
       const storyId = getStoryId(selected);
       console.log('Using storyId:', storyId);
-      const res = await fetch(api + '/stories/' + storyId + '/pages', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer '+token }, body: JSON.stringify({ content: pageContent, isEnd })});
+      const res = await fetch(api + '/stories/' + storyId + '/pages', { 
+        method:'POST', 
+        headers:{ 
+          'Content-Type':'application/json', 
+          Authorization: 'Bearer '+token 
+        }, 
+        body: JSON.stringify({ 
+          content: pageContent, 
+          isEnd,
+          endLabel: isEnd ? endLabel : ''
+        })
+      });
       console.log('Response status:', res.status);
       if(!res.ok) {
         const errText = await res.text();
@@ -101,7 +108,9 @@ export default function Editor({ api, token, user }){
       const j = await res.json();
       console.log('Page created:', j);
       await refreshStory(storyId);
-      setPageContent(''); setIsEnd(false);
+      setPageContent(''); 
+      setIsEnd(false);
+      setEndLabel('');
     }catch(e){
       console.error('Exception in createPage:', e);
       setError('Impossible de créer la page: ' + e.message);
@@ -170,7 +179,7 @@ export default function Editor({ api, token, user }){
               >
                 <option value="">-- Sélectionner un thème --</option>
                 {availableThemes.map(t => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t.value} value={t.value}>{t.label}</option>
                 ))}
               </select>
             </div>
@@ -199,6 +208,18 @@ export default function Editor({ api, token, user }){
                 <h5>Créer une page</h5>
                 <textarea rows={4} value={pageContent} onChange={e=>setPageContent(e.target.value)} placeholder="Contenu de la page" style={{width:'100%'}}/>
                 <label><input type="checkbox" checked={isEnd} onChange={e=>setIsEnd(e.target.checked)} /> Page finale</label><br/>
+                {isEnd && (
+                  <div style={{marginTop:'10px'}}>
+                    <label>Label de la fin : </label>
+                    <input 
+                      type="text" 
+                      value={endLabel} 
+                      onChange={e=>setEndLabel(e.target.value)} 
+                      placeholder="Ex: Fin héroïque, Fin tragique..."
+                      style={{width:'100%', marginTop:'5px'}}
+                    />
+                  </div>
+                )}
                 <button onClick={createPage}>Ajouter la page</button>
                 {error && <div style={{color:'red'}}>{error}</div>}
               </div>
@@ -208,7 +229,7 @@ export default function Editor({ api, token, user }){
                 {selected.pages.length === 0 && <div>Aucune page pour le moment.</div>}
                 {selected.pages.map(p=>(
                   <div key={p.pageId} style={{border:'1px solid #ddd', padding:8, marginTop:6}}>
-                    <div><strong>{p.isEnd ? 'FIN' : 'PAGE'}</strong></div>
+                    <div><strong>{p.isEnd ? `FIN: ${p.endLabel || 'Sans label'}` : 'PAGE'}</strong></div>
                     <div style={{whiteSpace:'pre-wrap'}}>{p.content}</div>
                     <div style={{marginTop:6}}>
                       <button onClick={()=>{ const t=prompt('Nouveau texte pour la page', p.content); if(t!==null) { const sid = getStoryId(selected); fetch(api + '/stories/' + sid + '/pages/' + p.pageId, { method:'PUT', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer '+token }, body: JSON.stringify({ content: t })}).then(()=>refreshStory(sid)); } }}>Éditer contenu</button>

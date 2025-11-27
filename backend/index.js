@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const storyRoutes = require('./routes/storyRoutes');
 const playRoutes = require('./routes/playRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const ratingRoutes = require('./routes/ratingRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 // Import models
 const Admin = require('./models/Admin');
@@ -44,6 +46,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/play', playRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Health check endpoint for Docker
 app.get('/api/health', (req, res) => {

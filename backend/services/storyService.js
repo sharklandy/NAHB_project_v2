@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 /**
  * Get all stories with optional filters
  */
-async function getAllStories(publishedOnly, searchQuery) {
+async function getAllStories(publishedOnly, searchQuery, themeFilter) {
   let query = {};
   if (publishedOnly) {
     query.status = 'published';
@@ -13,6 +13,13 @@ async function getAllStories(publishedOnly, searchQuery) {
   
   let stories = await Story.find(query).sort({ createdAt: -1 });
   
+  // Apply theme filter (case-insensitive)
+  if (themeFilter) {
+    const themeLower = themeFilter.toLowerCase();
+    stories = stories.filter(s => s.theme && s.theme.toLowerCase() === themeLower);
+  }
+  
+  // Apply search query
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     stories = stories.filter(s =>
@@ -67,12 +74,13 @@ async function updateStory(storyId, userId, updates) {
     throw new Error('not owner');
   }
   
-  const { title, description, tags, status, startPageId } = updates;
+  const { title, description, tags, status, startPageId, theme } = updates;
   if (title !== undefined) story.title = title;
   if (description !== undefined) story.description = description;
   if (tags !== undefined) story.tags = tags;
   if (status !== undefined) story.status = status;
   if (startPageId !== undefined) story.startPageId = startPageId;
+  if (theme !== undefined) story.theme = theme;
   
   await story.save();
   return story.toJSON();
@@ -98,7 +106,7 @@ async function deleteStory(storyId, userId, isAdmin) {
 /**
  * Add a page to a story
  */
-async function addPage(storyId, userId, content, isEnd) {
+async function addPage(storyId, userId, content, isEnd, endLabel) {
   const story = await Story.findById(storyId);
   if (!story) {
     throw new Error('not found');
@@ -112,6 +120,7 @@ async function addPage(storyId, userId, content, isEnd) {
     pageId: nanoid(),
     content: content || '',
     isEnd: !!isEnd,
+    endLabel: endLabel || '',
     choices: []
   };
   

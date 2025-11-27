@@ -1,25 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import './StoryList.css';
 
+const THEMES = [
+  { value: '', label: 'Tous les thèmes' },
+  { value: 'fantasy', label: '🧙 Fantasy' },
+  { value: 'sci-fi', label: '🚀 Science-Fiction' },
+  { value: 'horror', label: '👻 Horreur' },
+  { value: 'mystery', label: '🔍 Mystère' },
+  { value: 'romance', label: '❤️ Romance' },
+  { value: 'adventure', label: '⚔️ Aventure' },
+  { value: 'historical', label: '🏛️ Historique' },
+  { value: 'comedy', label: '😄 Comédie' },
+  { value: 'ocean', label: '🌊 Océan' }
+];
+
 export default function StoryList({ api, token, onEdit, onSelectStory }) {
   const [stories, setStories] = useState([]);
   const [q, setQ] = useState('');
+  const [selectedTheme, setSelectedTheme] = useState('');
+  const [ratings, setRatings] = useState({});
   
   useEffect(() => { 
     fetchList(); 
-  }, []);
+  }, [selectedTheme]);
   
   async function fetchList(){
     try {
-      const res = await fetch(api + '/stories?published=1' + (q ? '&q=' + encodeURIComponent(q) : ''));
+      let url = api + '/stories?published=1';
+      if (q) url += '&q=' + encodeURIComponent(q);
+      if (selectedTheme) url += '&theme=' + encodeURIComponent(selectedTheme);
+      
+      const res = await fetch(url);
       const j = await res.json();
       console.log('Fetched stories:', j);
       console.log('First story:', j[0]);
       console.log('First story keys:', j[0] ? Object.keys(j[0]) : 'no stories');
       setStories(j);
+      
+      // Load ratings for each story
+      j.forEach(story => {
+        loadRatingForStory(story.id || story._id);
+      });
     } catch(e) {
       console.error('Error fetching stories:', e);
       setStories([]);
+    }
+  }
+  
+  async function loadRatingForStory(storyId) {
+    try {
+      const res = await fetch(api + '/ratings/' + storyId + '/statistics');
+      const stats = await res.json();
+      setRatings(prev => ({ ...prev, [storyId]: stats }));
+    } catch(e) {
+      console.error('Error loading rating for story:', storyId, e);
     }
   }
   
@@ -29,15 +63,29 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
         <h2>Histoires Interactives</h2>
         <p>Choisissez votre aventure et vivez une expérience unique</p>
         
-        <div className="search-bar">
-          <input 
-            type="text" 
-            placeholder="Rechercher une histoire par titre..."
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && fetchList()}
-          />
-          <button onClick={fetchList}>Rechercher</button>
+        <div className="filters-section">
+          <div className="theme-filters">
+            {THEMES.map(theme => (
+              <button
+                key={theme.value}
+                className={`theme-btn ${selectedTheme === theme.value ? 'active' : ''}`}
+                onClick={() => setSelectedTheme(theme.value)}
+              >
+                {theme.label}
+              </button>
+            ))}
+          </div>
+          
+          <div className="search-bar">
+            <input 
+              type="text" 
+              placeholder="Rechercher une histoire par titre..."
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && fetchList()}
+            />
+            <button onClick={fetchList}>Rechercher</button>
+          </div>
         </div>
       </div>
       
@@ -58,8 +106,23 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
                   console.error('onSelectStory is not defined!');
                 }
               }}>
+                {s.theme && (
+                  <div className="story-theme-badge">
+                    {THEMES.find(t => t.value === s.theme)?.label || s.theme}
+                  </div>
+                )}
                 <h3>{s.title}</h3>
                 <p>{s.description}</p>
+                {ratings[storyId] && ratings[storyId].totalRatings > 0 && (
+                  <div className="story-rating">
+                    <span className="rating-stars">
+                      {'⭐'.repeat(Math.round(ratings[storyId].averageRating))}
+                    </span>
+                    <span className="rating-text">
+                      {ratings[storyId].averageRating.toFixed(1)} ({ratings[storyId].totalRatings} avis)
+                    </span>
+                  </div>
+                )}
                 {s.tags && s.tags.length > 0 && (
                   <div className="story-tags">
                     {s.tags.map((tag, idx) => (

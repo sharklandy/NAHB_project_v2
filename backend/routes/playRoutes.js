@@ -9,7 +9,7 @@ const { authMiddleware } = require('../middleware/auth');
  */
 router.post('/:storyId/start', authMiddleware, async (req, res) => {
   try {
-    const result = await playService.startStory(req.params.storyId);
+    const result = await playService.startStory(req.params.storyId, req.user.id);
     res.json(result);
   } catch (err) {
     const statusCode = err.message === 'story not available' ? 404 :
@@ -24,12 +24,13 @@ router.post('/:storyId/start', authMiddleware, async (req, res) => {
  */
 router.post('/:storyId/choose', authMiddleware, async (req, res) => {
   try {
-    const { currentPageId, choiceIndex } = req.body;
+    const { currentPageId, choiceIndex, playId } = req.body;
     const result = await playService.makeChoice(
       req.params.storyId,
       req.user.id,
       currentPageId,
-      choiceIndex
+      choiceIndex,
+      playId
     );
     res.json(result);
   } catch (err) {
@@ -37,6 +38,51 @@ router.post('/:storyId/choose', authMiddleware, async (req, res) => {
                        err.message === 'page not found' ||
                        err.message === 'choice not found' ? 404 : 500;
     res.status(statusCode).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/play/:storyId/statistics
+ * Get statistics for a story
+ */
+router.get('/:storyId/statistics', async (req, res) => {
+  try {
+    const stats = await playService.getStoryStatistics(req.params.storyId);
+    res.json(stats);
+  } catch (err) {
+    const statusCode = err.message === 'story not found' ? 404 : 500;
+    res.status(statusCode).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/play/:storyId/path-stats
+ * Get path similarity statistics
+ */
+router.post('/:storyId/path-stats', authMiddleware, async (req, res) => {
+  try {
+    const { endPageId, userPath } = req.body;
+    const stats = await playService.getPathStatistics(
+      req.params.storyId,
+      endPageId,
+      userPath
+    );
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/play/:storyId/endings
+ * Get user's unlocked endings for a story
+ */
+router.get('/:storyId/endings', authMiddleware, async (req, res) => {
+  try {
+    const endings = await playService.getUserEndings(req.params.storyId, req.user.id);
+    res.json(endings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

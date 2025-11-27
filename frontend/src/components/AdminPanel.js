@@ -5,15 +5,17 @@ function AdminPanel({ api, token }) {
   const [stats, setStats] = useState(null);
   const [stories, setStories] = useState([]);
   const [users, setUsers] = useState([]);
+  const [reports, setReports] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
-  const [view, setView] = useState('dashboard'); // dashboard, stories, users, userDetail
+  const [view, setView] = useState('dashboard'); // dashboard, stories, users, userDetail, reports
   const [error, setError] = useState('');
 
   useEffect(() => {
     loadStats();
     loadAllStories();
     loadUsers();
+    loadReports();
   }, []);
 
   async function loadStats() {
@@ -150,6 +152,64 @@ function AdminPanel({ api, token }) {
     }
   }
 
+  async function loadReports() {
+    try {
+      const res = await fetch(api + '/reports', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (!data.error) {
+        setReports(data);
+      }
+    } catch (err) {
+      console.error('Error loading reports:', err);
+    }
+  }
+
+  async function updateReportStatus(reportId, status) {
+    try {
+      const res = await fetch(api + '/reports/' + reportId, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        alert('Erreur: ' + data.error);
+      } else {
+        alert('Statut du signalement mis à jour');
+        loadReports();
+      }
+    } catch (err) {
+      alert('Erreur lors de la mise à jour');
+    }
+  }
+
+  const getReasonLabel = (reason) => {
+    const labels = {
+      'inappropriate': 'Contenu inapproprié',
+      'offensive': 'Contenu offensant',
+      'spam': 'Spam',
+      'copyright': 'Violation de droits d\'auteur',
+      'other': 'Autre'
+    };
+    return labels[reason] || reason;
+  };
+
+  const getStatusBadge = (status) => {
+    const badges = {
+      'pending': { class: 'badge-warning', text: 'En attente' },
+      'reviewed': { class: 'badge-info', text: 'En révision' },
+      'resolved': { class: 'badge-success', text: 'Résolu' },
+      'dismissed': { class: 'badge-secondary', text: 'Rejeté' }
+    };
+    return badges[status] || { class: '', text: status };
+  };
+
   async function toggleBanUser(userId, currentBanned) {
     const action = currentBanned ? 'débannir' : 'bannir';
     if (!window.confirm(`Voulez-vous vraiment ${action} cet utilisateur ?`)) return;
@@ -242,8 +302,11 @@ function AdminPanel({ api, token }) {
         <button onClick={() => setView('users')} style={{marginRight: '10px', fontWeight: view === 'users' ? 'bold' : 'normal'}}>
           👥 Utilisateurs ({users.length})
         </button>
-        <button onClick={() => setView('stories')} style={{fontWeight: view === 'stories' ? 'bold' : 'normal'}}>
+        <button onClick={() => setView('stories')} style={{marginRight: '10px', fontWeight: view === 'stories' ? 'bold' : 'normal'}}>
           📚 Histoires ({stories.length})
+        </button>
+        <button onClick={() => setView('reports')} style={{fontWeight: view === 'reports' ? 'bold' : 'normal'}}>
+          🚨 Signalements ({reports.filter(r => r.status === 'pending').length})
         </button>
       </nav>
 
@@ -457,6 +520,104 @@ function AdminPanel({ api, token }) {
                   </td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      
+      {view === 'reports' && (
+        <div>
+          <h3>🚨 Signalements</h3>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Histoire</th>
+                <th>Raison</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>
+                    Aucun signalement
+                  </td>
+                </tr>
+              ) : (
+                reports.map(report => {
+                  const badge = getStatusBadge(report.status);
+                  return (
+                    <tr key={report.id}>
+                      <td>
+                        <strong>{report.storyId?.title || 'Histoire supprimée'}</strong>
+                        <br />
+                        <small>{report.storyId?.description?.substring(0, 50) || ''}...</small>
+                      </td>
+                      <td>{getReasonLabel(report.reason)}</td>
+                      <td>{report.description || '-'}</td>
+                      <td>{new Date(report.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td>
+                        <span className={`status-badge ${badge.class}`}>
+                          {badge.text}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+                          {report.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => updateReportStatus(report.id, 'reviewed')}
+                                style={{ backgroundColor: '#007bff', color: 'white' }}
+                              >
+                                👁️ En révision
+                              </button>
+                              <button
+                                onClick={() => updateReportStatus(report.id, 'resolved')}
+                                style={{ backgroundColor: '#28a745', color: 'white' }}
+                              >
+                                ✅ Résolu
+                              </button>
+                              <button
+                                onClick={() => updateReportStatus(report.id, 'dismissed')}
+                                style={{ backgroundColor: '#6c757d', color: 'white' }}
+                              >
+                                ❌ Rejeter
+                              </button>
+                            </>
+                          )}
+                          {report.status === 'reviewed' && (
+                            <>
+                              <button
+                                onClick={() => updateReportStatus(report.id, 'resolved')}
+                                style={{ backgroundColor: '#28a745', color: 'white' }}
+                              >
+                                ✅ Résolu
+                              </button>
+                              <button
+                                onClick={() => updateReportStatus(report.id, 'dismissed')}
+                                style={{ backgroundColor: '#6c757d', color: 'white' }}
+                              >
+                                ❌ Rejeter
+                              </button>
+                            </>
+                          )}
+                          {report.storyId && (
+                            <button
+                              onClick={() => suspendStory(report.storyId.id || report.storyId._id)}
+                              style={{ backgroundColor: '#ff9800', color: 'white' }}
+                            >
+                              🚫 Suspendre l'histoire
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
