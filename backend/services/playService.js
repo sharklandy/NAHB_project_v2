@@ -119,9 +119,16 @@ async function getStoryStatistics(storyId) {
         isCompleted: true
       });
       
+      // Create a better label for endings without endLabel
+      let label = ending.endLabel;
+      if (!label || label.trim() === '') {
+        // Use first 50 characters of content as label
+        label = ending.content ? ending.content.substring(0, 50).trim() + '...' : 'Fin alternative';
+      }
+      
       return {
         pageId: ending.pageId,
-        label: ending.endLabel || 'Fin sans nom',
+        label: label,
         count: count,
         percentage: totalPlays > 0 ? ((count / totalPlays) * 100).toFixed(1) : 0
       };

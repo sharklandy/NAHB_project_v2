@@ -19,6 +19,22 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
   const [q, setQ] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('');
   const [ratings, setRatings] = useState({});
+  const [showReviewsModal, setShowReviewsModal] = useState(false);
+  const [selectedStoryReviews, setSelectedStoryReviews] = useState(null);
+  const [reviewsData, setReviewsData] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  useEffect(() => {
+    // Decode token to get current user info
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setCurrentUser({ id: payload.id, isAdmin: payload.isAdmin });
+      } catch(e) {
+        console.error('Error decoding token:', e);
+      }
+    }
+  }, [token]);
   
   useEffect(() => { 
     fetchList(); 
@@ -54,6 +70,49 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
       setRatings(prev => ({ ...prev, [storyId]: stats }));
     } catch(e) {
       console.error('Error loading rating for story:', storyId, e);
+    }
+  }
+  
+  async function loadReviews(storyId, storyTitle) {
+    try {
+      const res = await fetch(api + '/ratings/' + storyId);
+      const data = await res.json();
+      setSelectedStoryReviews({ id: storyId, title: storyTitle });
+      // data is already an array, not an object with a ratings property
+      setReviewsData(Array.isArray(data) ? data : []);
+      setShowReviewsModal(true);
+    } catch(e) {
+      console.error('Error loading reviews:', e);
+      alert('Erreur lors du chargement des avis');
+    }
+  }
+  
+  async function deleteReview(storyId, reviewUserId) {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
+      return;
+    }
+    
+    try {
+      const res = await fetch(api + '/ratings/' + storyId, {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      });
+      
+      if (res.ok) {
+        // Reload reviews
+        await loadReviews(storyId, selectedStoryReviews.title);
+        // Reload ratings stats
+        await loadRatingForStory(storyId);
+        alert('Avis supprimé avec succès');
+      } else {
+        const error = await res.json();
+        alert('Erreur: ' + (error.error || 'Impossible de supprimer l\'avis'));
+      }
+    } catch(e) {
+      console.error('Error deleting review:', e);
+      alert('Erreur lors de la suppression');
     }
   }
   
@@ -98,21 +157,23 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
           {stories.map(s => {
             const storyId = s.id || s._id;
             return (
-              <div key={storyId} className="story-card" onClick={() => {
-                console.log('Clicked story, id:', storyId, 's.id:', s.id, 's._id:', s._id); 
-                if(onSelectStory) {
-                  onSelectStory(storyId);
-                } else {
-                  console.error('onSelectStory is not defined!');
-                }
-              }}>
+              <div key={storyId} className="story-card">
                 {s.theme && (
                   <div className="story-theme-badge">
                     {THEMES.find(t => t.value === s.theme)?.label || s.theme}
                   </div>
                 )}
-                <h3>{s.title}</h3>
-                <p>{s.description}</p>
+                <div className="story-card-content" onClick={() => {
+                  console.log('Clicked story, id:', storyId, 's.id:', s.id, 's._id:', s._id); 
+                  if(onSelectStory) {
+                    onSelectStory(storyId);
+                  } else {
+                    console.error('onSelectStory is not defined!');
+                  }
+                }}>
+                  <h3>{s.title}</h3>
+                  <p>{s.description}</p>
+                </div>
                 {ratings[storyId] && ratings[storyId].totalRatings > 0 && (
                   <div className="story-rating">
                     <span className="rating-stars">
@@ -134,9 +195,83 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
                   <span>Auteur: {s.author?.username || 'Anonyme'}</span>
                   <span>Pages: {s.pages?.length || 0}</span>
                 </div>
+                {ratings[storyId] && ratings[storyId].totalRatings > 0 && (
+                  <button 
+                    className="btn-view-reviews"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      loadReviews(storyId, s.title);
+                    }}
+                  >
+                    💬 Voir les avis ({ratings[storyId].totalRatings})
+                  </button>
+                )}
               </div>
             );
           })}
+        </div>
+      )}
+      
+      {showReviewsModal && selectedStoryReviews && (
+        <div className="reviews-modal-overlay" onClick={() => setShowReviewsModal(false)}>
+          <div className="reviews-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="reviews-modal-header">
+              <h2>💬 Avis sur "{selectedStoryReviews.title}"</h2>
+              <button className="btn-close-modal" onClick={() => setShowReviewsModal(false)}>✕</button>
+            </div>
+            <div className="reviews-modal-content">
+              {reviewsData.length === 0 ? (
+                <p className="no-reviews">Aucun avis pour cette histoire</p>
+              ) : (
+                <div className="reviews-list">
+                  {reviewsData.map((review, idx) => {
+                    const canModify = currentUser && (
+                      currentUser.id === review.userId?._id || 
+                      currentUser.id === review.userId?.id ||
+                      currentUser.isAdmin
+                    );
+                    
+                    return (
+                      <div key={idx} className="review-item">
+                        <div className="review-header">
+                          <div className="review-rating">
+                            {'⭐'.repeat(review.rating)}
+                            <span className="review-rating-number">({review.rating}/5)</span>
+                          </div>
+                          <div className="review-author">
+                            {review.userId?.username || review.username || 'Anonyme'}
+                          </div>
+                        </div>
+                        {review.comment && (
+                          <p className="review-comment">{review.comment}</p>
+                        )}
+                        <div className="review-footer">
+                          <div className="review-date">
+                            {new Date(review.createdAt).toLocaleDateString('fr-FR', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </div>
+                          {canModify && (
+                            <div className="review-actions">
+                              <button 
+                                className="btn-delete-review"
+                                onClick={() => deleteReview(selectedStoryReviews.id, review.userId?._id || review.userId?.id)}
+                                title="Supprimer cet avis"
+                              >
+                                🗑️ Supprimer
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

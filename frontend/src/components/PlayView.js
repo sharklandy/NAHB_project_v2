@@ -236,6 +236,22 @@ export default function PlayView({ api, token, storyId, onBackToList }){
                   📚 Retour à la liste des histoires
                 </button>
               </div>
+              
+              <RatingSection 
+                api={api} 
+                token={token} 
+                storyId={currentStoryId}
+                isAuthenticated={!!token}
+              />
+              
+              <div className="report-section">
+                <button 
+                  className="btn-report-story"
+                  onClick={() => setShowReportModal(true)}
+                >
+                  🚨 Signaler cette histoire
+                </button>
+              </div>
             </div>
           ) : (
             <div className="choices-container">
@@ -252,26 +268,6 @@ export default function PlayView({ api, token, storyId, onBackToList }){
             </div>
           )}
         </div>
-      )}
-      
-      {currentStoryId && !page && (
-        <>
-          <RatingSection 
-            api={api} 
-            token={token} 
-            storyId={currentStoryId}
-            isAuthenticated={!!token}
-          />
-          
-          <div className="report-section">
-            <button 
-              className="btn-report-story"
-              onClick={() => setShowReportModal(true)}
-            >
-              🚨 Signaler cette histoire
-            </button>
-          </div>
-        </>
       )}
       
       {showReportModal && (
