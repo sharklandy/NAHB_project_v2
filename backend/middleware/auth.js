@@ -26,6 +26,26 @@ function authMiddleware(req, res, next) {
 }
 
 /**
+ * Middleware d'authentification optionnelle
+ * N'échoue pas si pas de token, mais l'ajoute si présent
+ */
+function optionalAuthMiddleware(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header) {
+    req.user = null;
+    return next();
+  }
+  const token = header.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+  } catch (e) {
+    req.user = null;
+  }
+  next();
+}
+
+/**
  * Check if a user email is an admin
  */
 async function isAdmin(email) {
@@ -50,6 +70,7 @@ async function requireAdmin(req, res, next) {
 
 module.exports = {
   authMiddleware,
+  optionalAuthMiddleware,
   isAdmin,
   requireAdmin,
   JWT_SECRET

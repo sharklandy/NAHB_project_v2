@@ -17,6 +17,11 @@ async function startStory(storyId, userId) {
     throw new Error('start page not set');
   }
   
+  // Si pas d'utilisateur connecté, retourner juste la première page sans sauvegarder
+  if (!userId) {
+    return { page: start, savedGame: false, playId: null };
+  }
+  
   // Check for existing saved game
   const savedGame = await Play.findOne({
     storyId: story._id,
@@ -67,6 +72,11 @@ async function makeChoice(storyId, userId, currentPageId, choiceIndex, playId) {
   
   if (!next) {
     throw new Error('next page not found');
+  }
+  
+  // Si pas d'utilisateur connecté, retourner juste la page suivante
+  if (!userId) {
+    return { page: next };
   }
   
   // Update or create play session
@@ -175,6 +185,11 @@ async function getPathStatistics(storyId, endPageId, userPath) {
  * Get user's unlocked endings for a story
  */
 async function getUserEndings(storyId, userId) {
+  // Si pas d'utilisateur connecté, retourner un tableau vide
+  if (!userId) {
+    return [];
+  }
+  
   const plays = await Play.find({
     storyId: storyId,
     userId: userId,

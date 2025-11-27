@@ -27,9 +27,13 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   }, [storyId]);
   
   async function startStory(id){
+    const headers = {};
+    if (token) {
+      headers.Authorization = 'Bearer ' + token;
+    }
     const r2 = await fetch(api + '/play/' + id + '/start', { 
       method: 'POST', 
-      headers: { Authorization: 'Bearer ' + token }
+      headers: headers
     });
     const j = await r2.json();
     if(j.error) {
@@ -55,6 +59,10 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   }
   
   async function loadUnlockedEndings(id) {
+    if (!token) {
+      setUnlockedEndings([]);
+      return;
+    }
     try {
       const res = await fetch(api + '/play/' + id + '/endings', {
         headers: { Authorization: 'Bearer ' + token }
@@ -67,12 +75,13 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   }
   
   async function choose(choiceIndex){
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers.Authorization = 'Bearer ' + token;
+    }
     const res = await fetch(api + '/play/' + currentStoryId + '/choose', { 
       method: 'POST', 
-      headers: { 
-        Authorization: 'Bearer ' + token, 
-        'Content-Type': 'application/json' 
-      }, 
+      headers: headers, 
       body: JSON.stringify({ 
         currentPageId: page.pageId, 
         choiceIndex,
@@ -107,17 +116,20 @@ export default function PlayView({ api, token, storyId, onBackToList }){
       const stats = await statsRes.json();
       setStatistics(stats);
       
-      // Load path statistics
-      const pathRes = await fetch(api + '/play/' + id + '/path-stats', {
-        method: 'POST',
-        headers: { 
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ endPageId, userPath: path })
-      });
-      const pathSt = await pathRes.json();
-      setPathStats(pathSt);
+      // Load path statistics only if token available
+      if (token && path.length > 0) {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers.Authorization = 'Bearer ' + token;
+        }
+        const pathRes = await fetch(api + '/play/' + id + '/path-stats', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ endPageId, userPath: path })
+        });
+        const pathSt = await pathRes.json();
+        setPathStats(pathSt);
+      }
     } catch(e) {
       console.error('Error loading statistics:', e);
     }
