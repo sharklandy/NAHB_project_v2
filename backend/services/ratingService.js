@@ -117,11 +117,24 @@ async function getUserAllRatings(userId) {
   return ratings;
 }
 
+/**
+ * Get all ratings with user and story information (admin)
+ */
+async function getAllRatings() {
+  const ratings = await Rating.find()
+    .populate('storyId', 'title description theme')
+    .populate('userId', 'username email')
+    .sort({ createdAt: -1 });
+  
+  return ratings;
+}
+
 module.exports = {
   addOrUpdateRating,
   getRatingsForStory,
   getRatingStatistics,
   getUserRating,
   deleteRating,
-  getUserAllRatings
+  getUserAllRatings,
+  getAllRatings
 };

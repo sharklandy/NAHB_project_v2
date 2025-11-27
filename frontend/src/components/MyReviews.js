@@ -9,8 +9,12 @@ export default function MyReviews() {
   const [editingReview, setEditingReview] = useState(null);
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    // Check if user is admin
+    const user = JSON.parse(localStorage.getItem('nahb_user') || 'null');
+    setIsAdmin(user && user.email === 'admin@nahb.local');
     loadMyReviews();
   }, []);
 
@@ -18,9 +22,14 @@ export default function MyReviews() {
     const token = localStorage.getItem('nahb_token');
     if (!token) return;
 
+    // Check if user is admin
+    const user = JSON.parse(localStorage.getItem('nahb_user') || 'null');
+    const adminMode = user && user.email === 'admin@nahb.local';
+
     try {
       setLoading(true);
-      const res = await fetch(`${api}/ratings/user/me`, {
+      const endpoint = adminMode ? `${api}/ratings/all` : `${api}/ratings/user/me`;
+      const res = await fetch(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -37,14 +46,19 @@ export default function MyReviews() {
     }
   }
 
-  async function deleteReview(storyId) {
+  async function deleteReview(storyId, userId = null) {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
       return;
     }
 
     const token = localStorage.getItem('nahb_token');
     try {
-      const res = await fetch(`${api}/ratings/${storyId}`, {
+      // If admin and userId is provided, use admin route
+      const endpoint = isAdmin && userId 
+        ? `${api}/ratings/${storyId}/user/${userId}`
+        : `${api}/ratings/${storyId}`;
+        
+      const res = await fetch(endpoint, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -110,8 +124,8 @@ export default function MyReviews() {
   return (
     <div className="my-reviews-container">
       <div className="my-reviews-header">
-        <h2>Mes Avis</h2>
-        <p className="reviews-count">{myReviews.length} avis laissé{myReviews.length > 1 ? 's' : ''}</p>
+        <h2>{isAdmin ? 'Tous les Avis' : 'Mes Avis'}</h2>
+        <p className="reviews-count">{myReviews.length} avis {isAdmin ? 'au total' : 'laissé' + (myReviews.length > 1 ? 's' : '')}</p>
       </div>
 
       {myReviews.length === 0 ? (
@@ -128,12 +142,21 @@ export default function MyReviews() {
             const storyTitle = typeof review.storyId === 'object' 
               ? review.storyId.title 
               : 'Histoire';
+            const userName = typeof review.userId === 'object'
+              ? review.userId.username
+              : 'Utilisateur';
+            const userId = typeof review.userId === 'object'
+              ? (review.userId._id || review.userId.id)
+              : review.userId;
             const isEditing = editingReview === storyId;
 
             return (
               <div key={storyId} className="my-review-card">
                 <div className="review-story-info">
                   <h3>{storyTitle}</h3>
+                  {isAdmin && (
+                    <p className="review-user">👤 {userName}</p>
+                  )}
                   <p className="review-date">
                     {new Date(review.createdAt).toLocaleDateString('fr-FR', {
                       year: 'numeric',
@@ -192,7 +215,7 @@ export default function MyReviews() {
                       <button className="btn-edit" onClick={() => startEdit(review)}>
                         ✏️ Modifier
                       </button>
-                      <button className="btn-delete" onClick={() => deleteReview(storyId)}>
+                      <button className="btn-delete" onClick={() => deleteReview(storyId, userId)}>
                         🗑️ Supprimer
                       </button>
                     </div>
