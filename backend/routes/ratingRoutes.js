@@ -51,6 +51,19 @@ router.get('/:storyId/statistics', async (req, res) => {
 });
 
 /**
+ * GET /api/ratings/user/me
+ * Get all ratings from current user
+ */
+router.get('/user/me', authMiddleware, async (req, res) => {
+  try {
+    const ratings = await ratingService.getUserAllRatings(req.user.id);
+    res.json(ratings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
  * GET /api/ratings/:storyId/user
  * Get user's rating for a story
  */

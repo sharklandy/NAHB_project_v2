@@ -106,10 +106,22 @@ async function deleteRating(storyId, userId) {
   return { ok: true };
 }
 
+/**
+ * Get all ratings from a user with story information
+ */
+async function getUserAllRatings(userId) {
+  const ratings = await Rating.find({ userId })
+    .populate('storyId', 'title description theme')
+    .sort({ createdAt: -1 });
+  
+  return ratings;
+}
+
 module.exports = {
   addOrUpdateRating,
   getRatingsForStory,
   getRatingStatistics,
   getUserRating,
-  deleteRating
+  deleteRating,
+  getUserAllRatings
 };

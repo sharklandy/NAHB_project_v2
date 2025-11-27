@@ -118,6 +118,9 @@
   cursor: pointer;
   border: 3px solid transparent;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .story-theme-badge {
@@ -146,6 +149,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: pre-line;
 }
 
 .story-card p {
@@ -153,6 +157,7 @@
   line-height: 1.6;
   margin-bottom: 1rem;
   font-size: 1rem;
+  flex-grow: 1;
 }
 
 .story-rating {
@@ -163,6 +168,7 @@
   padding: 0.5rem;
   background: rgba(102, 126, 234, 0.1);
   border-radius: 8px;
+  margin-top: auto;
 }
 
 .rating-stars {
@@ -212,7 +218,7 @@
 /* Button to view reviews */
 .btn-view-reviews {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   padding: 0.75rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -332,6 +338,11 @@
   padding: 1.25rem;
   border-left: 4px solid #667eea;
   transition: all 0.3s ease;
+  display: grid;
+  grid-template-columns: 150px 1fr 120px;
+  grid-template-rows: auto auto auto;
+  gap: 0.75rem;
+  align-items: start;
 }
 
 .review-item:hover {
@@ -340,10 +351,11 @@
 }
 
 .review-header {
-  display: flex;
-  justify-content: space-between;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 150px 1fr 120px;
   align-items: center;
-  margin-bottom: 0.75rem;
+  gap: 1rem;
 }
 
 .review-rating {
@@ -351,6 +363,8 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 1.1rem;
+  width: 150px;
+  flex-shrink: 0;
 }
 
 .review-rating-number {
@@ -363,20 +377,25 @@
   font-weight: 600;
   color: #667eea;
   font-size: 0.95rem;
+  text-align: right;
+  width: 120px;
+  flex-shrink: 0;
 }
 
 .review-comment {
-  margin: 0.75rem 0;
+  grid-column: 1 / -1;
+  margin: 0;
   line-height: 1.6;
   color: #333;
   font-size: 0.95rem;
 }
 
 .review-footer {
+  grid-column: 1 / -1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.75rem;
+  margin: 0;
 }
 
 .review-date {

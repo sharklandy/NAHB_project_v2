@@ -105,14 +105,12 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
         await loadReviews(storyId, selectedStoryReviews.title);
         // Reload ratings stats
         await loadRatingForStory(storyId);
-        alert('Avis supprimé avec succès');
       } else {
         const error = await res.json();
-        alert('Erreur: ' + (error.error || 'Impossible de supprimer l\'avis'));
+        console.error('Erreur:', error.error || 'Impossible de supprimer l\'avis');
       }
     } catch(e) {
       console.error('Error deleting review:', e);
-      alert('Erreur lors de la suppression');
     }
   }
   

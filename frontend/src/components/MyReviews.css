@@ -1,0 +1,259 @@
+.my-reviews-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.my-reviews-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.my-reviews-header h2 {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.reviews-count {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 3rem;
+  color: #667eea;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.no-reviews p {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.hint {
+  color: #999 !important;
+  font-size: 1rem !important;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.my-review-card {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.my-review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+}
+
+.review-story-info h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.review-date {
+  color: #999;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.review-content {
+  margin-bottom: 1.5rem;
+}
+
+.review-rating-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.rating-number {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.review-comment-text {
+  color: #555;
+  line-height: 1.6;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.review-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-edit,
+.btn-delete {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-edit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-delete {
+  background: #ff4757;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #ee2e3c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+}
+
+/* Edit Form */
+.edit-form {
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 10px;
+  margin-top: 1rem;
+}
+
+.edit-rating,
+.edit-comment {
+  margin-bottom: 1.5rem;
+}
+
+.edit-rating label,
+.edit-comment label {
+  display: block;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.star-selector {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 2rem;
+}
+
+.star-selector .star {
+  cursor: pointer;
+  opacity: 0.3;
+  transition: all 0.2s ease;
+}
+
+.star-selector .star.selected {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.star-selector .star:hover {
+  opacity: 0.8;
+  transform: scale(1.2);
+}
+
+.edit-comment textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.edit-comment textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-save,
+.btn-cancel {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: #d0d0d0;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-reviews-container {
+    padding: 1rem;
+  }
+
+  .my-reviews-header h2 {
+    font-size: 2rem;
+  }
+}

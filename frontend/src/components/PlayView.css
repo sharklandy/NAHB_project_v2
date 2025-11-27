@@ -167,19 +167,21 @@
 }
 
 .story-page h3 {
-  color: #333;
+  color: #1a1a1a;
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
   border-bottom: 3px solid #667eea;
   padding-bottom: 0.5rem;
+  font-weight: 700;
 }
 
 .story-content {
-  color: #555;
+  color: #222;
   font-size: 1.1rem;
   line-height: 1.8;
   margin-bottom: 2rem;
   white-space: pre-wrap;
+  font-weight: 500;
 }
 
 .choices-container {
@@ -355,8 +357,10 @@
 
 .ending-label {
   display: block;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.5rem;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .ending-bar {
@@ -375,7 +379,9 @@
 
 .ending-percentage {
   font-size: 0.9rem;
-  opacity: 0.9;
+  color: white;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .unlocked-endings {

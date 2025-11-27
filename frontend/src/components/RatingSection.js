@@ -56,7 +56,6 @@ export default function RatingSection({ api, token, storyId, isAuthenticated }) 
 
   async function submitRating() {
     if (selectedRating === 0) {
-      alert('Veuillez sélectionner une note');
       return;
     }
 
@@ -76,13 +75,11 @@ export default function RatingSection({ api, token, storyId, isAuthenticated }) 
         await loadStatistics();
         await loadUserRating();
         setShowForm(false);
-        alert('Votre note a été enregistrée !');
       } else {
-        alert('Erreur lors de l\'enregistrement de la note');
+        console.error('Erreur lors de l\'enregistrement de la note');
       }
     } catch (e) {
       console.error('Error submitting rating:', e);
-      alert('Erreur lors de l\'enregistrement');
     } finally {
       setLoading(false);
     }

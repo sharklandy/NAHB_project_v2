@@ -7,6 +7,7 @@ import StoryList from './components/StoryList';
 import PlayView from './components/PlayView';
 import Editor from './components/Editor';
 import AdminPanel from './components/AdminPanel';
+import MyReviews from './components/MyReviews';
 
 const API = process.env.REACT_APP_API || 'http://localhost:4000/api';
 
@@ -50,6 +51,9 @@ function App(){
                 </Link>
                 <Link to="/editor">
                   <button>Editeur</button>
+                </Link>
+                <Link to="/my-reviews">
+                  <button>Mes Avis</button>
                 </Link>
                 <Link to="/play">
                   <button>Lecture</button>
@@ -97,6 +101,7 @@ function App(){
             <Routes>
               <Route path="/" element={<StoryListWrapper api={API} token={token} />} />
               <Route path="/editor" element={<Editor api={API} token={token} user={user} />} />
+              <Route path="/my-reviews" element={<MyReviews />} />
               <Route path="/play/:storyId" element={<PlayViewWrapper api={API} token={token} />} />
               <Route path="/play" element={<Navigate to="/" replace />} />
               {user && user.email === 'admin@nahb.local' && (

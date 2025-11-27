@@ -15,7 +15,7 @@ async function createGardienStory(token) {
         'Authorization': 'Bearer ' + token
       },
       body: JSON.stringify({
-        title: 'L\'Eveil du Dernier Gardien',
+        title: 'L\'Eveil du Dernier\nGardien',
         description: 'Une aventure épique où vous incarnez le dernier gardien d\'un sanctuaire ancien, chargé de protéger le monde des forces obscures qui menacent de s\'échapper.',
         tags: ['fantasy', 'aventure', 'gardien', 'épique'],
         theme: 'Fantasy'

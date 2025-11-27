@@ -16,7 +16,6 @@ export default function ReportModal({ api, token, storyId, storyTitle, onClose }
 
   async function submitReport() {
     if (!reason) {
-      alert('Veuillez sélectionner une raison');
       return;
     }
 
@@ -32,19 +31,17 @@ export default function ReportModal({ api, token, storyId, storyTitle, onClose }
       });
 
       if (res.ok) {
-        alert('Votre signalement a été envoyé. Merci de nous aider à maintenir la qualité du contenu.');
         onClose();
       } else {
         const data = await res.json();
         if (data.error === 'already reported') {
-          alert('Vous avez déjà signalé cette histoire.');
+          console.error('Vous avez déjà signalé cette histoire');
         } else {
-          alert('Erreur lors de l\'envoi du signalement');
+          console.error('Erreur lors de l\'envoi du signalement');
         }
       }
     } catch (e) {
       console.error('Error submitting report:', e);
-      alert('Erreur lors de l\'envoi');
     } finally {
       setLoading(false);
     }

@@ -50,7 +50,7 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     
     // Show saved game notification
     if (j.savedGame) {
-      alert('Partie sauvegardée reprise !');
+      console.log('Partie sauvegardée reprise');
     }
   }
   
@@ -95,7 +95,7 @@ export default function PlayView({ api, token, storyId, onBackToList }){
         await loadUnlockedEndings(currentStoryId);
       }
     } else { 
-      alert('Fin de l histoire'); 
+      console.log('Fin de l\'histoire'); 
       setPage(null); 
     }
   }
