@@ -34,7 +34,7 @@
   background-attachment: fixed;
 }
 
-/* Dragon avec animation d'aller-retour lent */
+/* Dragon avec animation d'aller-retour lent avec variations aléatoires */
 .fantasy-dragon {
   position: absolute;
   top: 20%;
@@ -46,23 +46,10 @@
   background-position: center;
   background-repeat: no-repeat;
   pointer-events: none;
-  animation: dragonFly 30s ease-in-out infinite;
-}
-
-/* Tour centrée et responsive - même largeur que le contenu */
-.fantasy-tower {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -40%);
-  width: 900px;
-  max-width: 90vw;
-  height: 90vh;
-  background-image: url('../assets/fantasy-light/tour.png');
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  pointer-events: none;
+  animation: 
+    dragonFly 30s infinite,
+    dragonSize 30s infinite,
+    dragonHeight 30s infinite;
 }
 
 @keyframes dragonFly {
@@ -83,17 +70,46 @@
   }
 }
 
+@keyframes dragonSize {
+  0%, 100% {
+    width: 180px;
+    height: 180px;
+  }
+  25% {
+    width: 280px;
+    height: 280px;
+  }
+  50% {
+    width: 220px;
+    height: 220px;
+  }
+  75% {
+    width: 320px;
+    height: 320px;
+  }
+}
+
+@keyframes dragonHeight {
+  0%, 100% {
+    top: 15%;
+  }
+  25% {
+    top: 35%;
+  }
+  50% {
+    top: 10%;
+  }
+  75% {
+    top: 25%;
+  }
+}
+
 /* Ajustements responsive pour le dragon */
 @media (max-width: 768px) {
   .fantasy-dragon {
     width: 150px;
     height: 150px;
     top: 15%;
-  }
-  
-  .fantasy-tower {
-    width: 90vw;
-    height: 60vh;
   }
 }
 
