@@ -9,7 +9,6 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   const [page, setPage] = useState(null);
   const [storyTitle, setStoryTitle] = useState('');
   const [storyTheme, setStoryTheme] = useState('');
-  const [userThemeMode, setUserThemeMode] = useState('light'); // light ou dark
   const [playId, setPlayId] = useState(null);
   const [path, setPath] = useState([]);
   const [statistics, setStatistics] = useState(null);
@@ -135,12 +134,14 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     }
   }
   
-  // Déterminer la classe de thème
+  // Déterminer la classe de thème en se basant sur le thème global (body.dark-theme)
   const getThemeClass = () => {
-    if ((storyTheme === 'Fantasy' || storyTheme === 'fantasy') && userThemeMode === 'light') {
+    const isDark = typeof document !== 'undefined' && document.body.classList.contains('dark-theme');
+    // si on est en mode clair et que l'histoire a un thème spécifique, appliquer les variantes "-light"
+    if ((storyTheme === 'Fantasy' || storyTheme === 'fantasy') && !isDark) {
       return 'theme-fantasy-light';
     }
-    if ((storyTheme === 'Ocean' || storyTheme === 'ocean') && userThemeMode === 'light') {
+    if ((storyTheme === 'Ocean' || storyTheme === 'ocean') && !isDark) {
       return 'theme-ocean-light';
     }
     // Ajouter d'autres thèmes ici plus tard

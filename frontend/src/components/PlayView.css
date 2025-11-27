@@ -466,3 +466,13 @@
   }
 }
 
+/* Ensure ending header and statistics text remain readable on the accent background */
+.ending-message h4,
+.ending-message p,
+.ending-message .stat-highlight,
+.ending-message .stat-detail,
+.ending-message .ending-percentage,
+.ending-message .ending-label {
+  color: rgba(255,255,255,0.95);
+}
+

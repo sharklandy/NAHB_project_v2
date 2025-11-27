@@ -121,34 +121,47 @@ export default function MyReviews() {
     return <div className="my-reviews-container"><p className="loading-text">Chargement...</p></div>;
   }
 
+  // Filtrer les avis avec storyId null
+  const validReviews = myReviews.filter(review => review.storyId != null);
+
   return (
     <div className="my-reviews-container">
       <div className="my-reviews-header">
         <h2>{isAdmin ? 'Tous les Avis' : 'Mes Avis'}</h2>
-        <p className="reviews-count">{myReviews.length} avis {isAdmin ? 'au total' : 'laissé' + (myReviews.length > 1 ? 's' : '')}</p>
+        <p className="reviews-count">{validReviews.length} avis {isAdmin ? 'au total' : 'laissé' + (validReviews.length > 1 ? 's' : '')}</p>
       </div>
 
-      {myReviews.length === 0 ? (
+      {validReviews.length === 0 ? (
         <div className="no-reviews">
           <p>Vous n'avez pas encore laissé d'avis.</p>
           <p className="hint">Jouez à une histoire et laissez votre première évaluation !</p>
         </div>
       ) : (
         <div className="reviews-grid">
-          {myReviews.map((review) => {
+          {validReviews.map((review) => {
+            // Vérifier si storyId existe
+            if (!review.storyId) {
+              return null; // Ignorer les avis avec storyId null
+            }
+
             const storyId = typeof review.storyId === 'object' 
               ? (review.storyId._id || review.storyId.id) 
               : review.storyId;
             const storyTitle = typeof review.storyId === 'object' 
               ? review.storyId.title 
               : 'Histoire';
-            const userName = typeof review.userId === 'object'
+            const userName = typeof review.userId === 'object' && review.userId
               ? review.userId.username
               : 'Utilisateur';
-            const userId = typeof review.userId === 'object'
+            const userId = typeof review.userId === 'object' && review.userId
               ? (review.userId._id || review.userId.id)
               : review.userId;
             const isEditing = editingReview === storyId;
+
+            // Ne pas afficher si storyId est invalide
+            if (!storyId) {
+              return null;
+            }
 
             return (
               <div key={storyId} className="my-review-card">
