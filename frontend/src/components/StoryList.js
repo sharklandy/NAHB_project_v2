@@ -28,6 +28,17 @@ export default function StoryList({ api, token, onEdit, onSelectStory }) {
       <div className="story-list-header">
         <h2>Histoires Interactives</h2>
         <p>Choisissez votre aventure et vivez une expérience unique</p>
+        
+        <div className="search-bar">
+          <input 
+            type="text" 
+            placeholder="Rechercher une histoire par titre..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && fetchList()}
+          />
+          <button onClick={fetchList}>Rechercher</button>
+        </div>
       </div>
       
       {stories.length === 0 ? (
