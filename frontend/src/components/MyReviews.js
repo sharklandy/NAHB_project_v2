@@ -15,7 +15,7 @@ export default function MyReviews() {
   }, []);
 
   async function loadMyReviews() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('nahb_token');
     if (!token) return;
 
     try {
@@ -27,6 +27,8 @@ export default function MyReviews() {
       if (res.ok) {
         const data = await res.json();
         setMyReviews(data);
+      } else {
+        console.error('Failed to load reviews:', res.status);
       }
     } catch (e) {
       console.error('Error loading reviews:', e);
@@ -40,7 +42,7 @@ export default function MyReviews() {
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('nahb_token');
     try {
       const res = await fetch(`${api}/ratings/${storyId}`, {
         method: 'DELETE',
@@ -62,7 +64,7 @@ export default function MyReviews() {
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('nahb_token');
     try {
       const res = await fetch(`${api}/ratings/${storyId}`, {
         method: 'POST',
@@ -87,7 +89,10 @@ export default function MyReviews() {
   }
 
   function startEdit(review) {
-    setEditingReview(review.storyId._id || review.storyId);
+    const storyId = typeof review.storyId === 'object' 
+      ? (review.storyId._id || review.storyId.id) 
+      : review.storyId;
+    setEditingReview(storyId);
     setEditRating(review.rating);
     setEditComment(review.comment || '');
   }
@@ -117,13 +122,18 @@ export default function MyReviews() {
       ) : (
         <div className="reviews-grid">
           {myReviews.map((review) => {
-            const storyId = review.storyId._id || review.storyId;
+            const storyId = typeof review.storyId === 'object' 
+              ? (review.storyId._id || review.storyId.id) 
+              : review.storyId;
+            const storyTitle = typeof review.storyId === 'object' 
+              ? review.storyId.title 
+              : 'Histoire';
             const isEditing = editingReview === storyId;
 
             return (
               <div key={storyId} className="my-review-card">
                 <div className="review-story-info">
-                  <h3>{review.storyId.title || 'Histoire'}</h3>
+                  <h3>{storyTitle}</h3>
                   <p className="review-date">
                     {new Date(review.createdAt).toLocaleDateString('fr-FR', {
                       year: 'numeric',

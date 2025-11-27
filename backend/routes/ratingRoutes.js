@@ -4,6 +4,20 @@ const ratingService = require('../services/ratingService');
 const { authMiddleware } = require('../middleware/auth');
 
 /**
+ * GET /api/ratings/user/me
+ * Get all ratings from current user
+ * MUST BE BEFORE /:storyId routes
+ */
+router.get('/user/me', authMiddleware, async (req, res) => {
+  try {
+    const ratings = await ratingService.getUserAllRatings(req.user.id);
+    res.json(ratings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
  * POST /api/ratings/:storyId
  * Add or update a rating for a story
  */
@@ -25,19 +39,6 @@ router.post('/:storyId', authMiddleware, async (req, res) => {
 });
 
 /**
- * GET /api/ratings/:storyId
- * Get all ratings for a story
- */
-router.get('/:storyId', async (req, res) => {
-  try {
-    const ratings = await ratingService.getRatingsForStory(req.params.storyId);
-    res.json(ratings);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/**
  * GET /api/ratings/:storyId/statistics
  * Get rating statistics for a story
  */
@@ -51,12 +52,12 @@ router.get('/:storyId/statistics', async (req, res) => {
 });
 
 /**
- * GET /api/ratings/user/me
- * Get all ratings from current user
+ * GET /api/ratings/:storyId
+ * Get all ratings for a story
  */
-router.get('/user/me', authMiddleware, async (req, res) => {
+router.get('/:storyId', async (req, res) => {
   try {
-    const ratings = await ratingService.getUserAllRatings(req.user.id);
+    const ratings = await ratingService.getRatingsForStory(req.params.storyId);
     res.json(ratings);
   } catch (err) {
     res.status(500).json({ error: err.message });
