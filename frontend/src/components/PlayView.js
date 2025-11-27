@@ -140,6 +140,9 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     if ((storyTheme === 'Fantasy' || storyTheme === 'fantasy') && userThemeMode === 'light') {
       return 'theme-fantasy-light';
     }
+    if ((storyTheme === 'Ocean' || storyTheme === 'ocean') && userThemeMode === 'light') {
+      return 'theme-ocean-light';
+    }
     // Ajouter d'autres thèmes ici plus tard
     return '';
   };
