@@ -9,6 +9,7 @@ const pageSchema = new mongoose.Schema({
   pageId: { type: String, required: true },
   content: { type: String, required: true },
   isEnd: { type: Boolean, default: false },
+  endLabel: { type: String, default: '' }, // Label de la fin (ex: "Fin héroïque")
   choices: [choiceSchema]
 }, { _id: false });
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './PlayView.css';
+import RatingSection from './RatingSection';
+import ReportModal from './ReportModal';
 
 export default function PlayView({ api, token, storyId, onBackToList }){
   console.log('PlayView mounted with storyId:', storyId);
@@ -8,6 +10,13 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   const [storyTitle, setStoryTitle] = useState('');
   const [storyTheme, setStoryTheme] = useState('');
   const [userThemeMode, setUserThemeMode] = useState('light'); // light ou dark
+  const [playId, setPlayId] = useState(null);
+  const [path, setPath] = useState([]);
+  const [statistics, setStatistics] = useState(null);
+  const [pathStats, setPathStats] = useState(null);
+  const [unlockedEndings, setUnlockedEndings] = useState([]);
+  const [showEndings, setShowEndings] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   
   useEffect(() => {
     console.log('PlayView useEffect, storyId:', storyId);
@@ -28,12 +37,33 @@ export default function PlayView({ api, token, storyId, onBackToList }){
       return;
     }
     setPage(j.page);
+    setPlayId(j.playId);
+    setPath([j.page.pageId]);
+    
     const res = await fetch(api + '/stories/' + id);
     const story = await res.json();
     setStoryTitle(story.title || 'Histoire');
-    
-    // Déterminer le thème basé sur le champ theme de l'histoire
     setStoryTheme(story.theme || 'Fantasy');
+    
+    // Load unlocked endings
+    loadUnlockedEndings(id);
+    
+    // Show saved game notification
+    if (j.savedGame) {
+      alert('Partie sauvegardée reprise !');
+    }
+  }
+  
+  async function loadUnlockedEndings(id) {
+    try {
+      const res = await fetch(api + '/play/' + id + '/endings', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const endings = await res.json();
+      setUnlockedEndings(endings);
+    } catch(e) {
+      console.error('Error loading endings:', e);
+    }
   }
   
   async function choose(choiceIndex){
@@ -43,17 +73,53 @@ export default function PlayView({ api, token, storyId, onBackToList }){
         Authorization: 'Bearer ' + token, 
         'Content-Type': 'application/json' 
       }, 
-      body: JSON.stringify({ currentPageId: page.pageId, choiceIndex })
+      body: JSON.stringify({ 
+        currentPageId: page.pageId, 
+        choiceIndex,
+        playId 
+      })
     });
     const j = await res.json();
     if(j.error) {
       alert('Erreur: ' + j.error);
       return;
     }
-    if(j.page) setPage(j.page);
-    else { 
+    if(j.page) {
+      setPage(j.page);
+      setPlayId(j.playId);
+      setPath([...path, j.page.pageId]);
+      
+      // If reaching an end, load statistics
+      if (j.page.isEnd) {
+        await loadStatistics(currentStoryId, j.page.pageId);
+        await loadUnlockedEndings(currentStoryId);
+      }
+    } else { 
       alert('Fin de l histoire'); 
       setPage(null); 
+    }
+  }
+  
+  async function loadStatistics(id, endPageId) {
+    try {
+      // Load story statistics
+      const statsRes = await fetch(api + '/play/' + id + '/statistics');
+      const stats = await statsRes.json();
+      setStatistics(stats);
+      
+      // Load path statistics
+      const pathRes = await fetch(api + '/play/' + id + '/path-stats', {
+        method: 'POST',
+        headers: { 
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ endPageId, userPath: path })
+      });
+      const pathSt = await pathRes.json();
+      setPathStats(pathSt);
+    } catch(e) {
+      console.error('Error loading statistics:', e);
     }
   }
   
@@ -97,18 +163,77 @@ export default function PlayView({ api, token, storyId, onBackToList }){
           
           {page.isEnd ? (
             <div className="ending-message">
-              <h4>Fin de cette histoire !</h4>
-              <p>Vous avez terminé cette aventure. Que souhaitez-vous faire ?</p>
+              <h4>🎭 {page.endLabel || 'Fin de cette histoire !'}</h4>
+              <p>Vous avez terminé cette aventure.</p>
+              
+              {pathStats && (
+                <div className="path-statistics">
+                  <p className="stat-highlight">
+                    📊 Vous avez pris le même chemin que <strong>{pathStats.similarityPercentage}%</strong> des joueurs qui ont atteint cette fin.
+                  </p>
+                  <p className="stat-detail">
+                    Cette fin a été atteinte {pathStats.totalPlays} fois.
+                  </p>
+                </div>
+              )}
+              
+              {statistics && (
+                <div className="story-statistics">
+                  <h5>📈 Statistiques globales</h5>
+                  <p>Total de parties jouées : <strong>{statistics.totalPlays}</strong></p>
+                  {statistics.endings && statistics.endings.length > 0 && (
+                    <div className="endings-distribution">
+                      <h6>Répartition des fins :</h6>
+                      {statistics.endings.map((ending, idx) => (
+                        <div key={idx} className="ending-stat">
+                          <span className="ending-label">{ending.label}</span>
+                          <div className="ending-bar">
+                            <div 
+                              className="ending-bar-fill" 
+                              style={{width: `${ending.percentage}%`}}
+                            ></div>
+                          </div>
+                          <span className="ending-percentage">{ending.percentage}% ({ending.count} fois)</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {unlockedEndings.length > 0 && (
+                <div className="unlocked-endings">
+                  <button 
+                    className="btn-show-endings"
+                    onClick={() => setShowEndings(!showEndings)}
+                  >
+                    🏆 Voir mes fins débloquées ({unlockedEndings.length})
+                  </button>
+                  {showEndings && (
+                    <div className="endings-list">
+                      {unlockedEndings.map((ending, idx) => (
+                        <div key={idx} className="unlocked-ending-card">
+                          <h6>{ending.label}</h6>
+                          <p>{ending.content.substring(0, 100)}...</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <div className="ending-actions">
                 <button onClick={() => startStory(currentStoryId)}>
-                  Rejouer cette histoire
+                  🔄 Rejouer cette histoire
                 </button>
                 <button onClick={() => { 
                   setPage(null); 
                   setCurrentStoryId(null); 
+                  setStatistics(null);
+                  setPathStats(null);
                   if(onBackToList) onBackToList();
                 }}>
-                  Retour à la liste des histoires
+                  📚 Retour à la liste des histoires
                 </button>
               </div>
             </div>
@@ -127,6 +252,36 @@ export default function PlayView({ api, token, storyId, onBackToList }){
             </div>
           )}
         </div>
+      )}
+      
+      {currentStoryId && !page && (
+        <>
+          <RatingSection 
+            api={api} 
+            token={token} 
+            storyId={currentStoryId}
+            isAuthenticated={!!token}
+          />
+          
+          <div className="report-section">
+            <button 
+              className="btn-report-story"
+              onClick={() => setShowReportModal(true)}
+            >
+              🚨 Signaler cette histoire
+            </button>
+          </div>
+        </>
+      )}
+      
+      {showReportModal && (
+        <ReportModal
+          api={api}
+          token={token}
+          storyId={currentStoryId}
+          storyTitle={storyTitle}
+          onClose={() => setShowReportModal(false)}
+        />
       )}
     </div>
   );

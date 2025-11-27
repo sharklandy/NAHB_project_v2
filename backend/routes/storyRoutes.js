@@ -11,7 +11,8 @@ router.get('/', async (req, res) => {
   try {
     const publishedOnly = req.query.published === '1';
     const searchQuery = req.query.q || '';
-    const stories = await storyService.getAllStories(publishedOnly, searchQuery);
+    const themeFilter = req.query.theme || '';
+    const stories = await storyService.getAllStories(publishedOnly, searchQuery, themeFilter);
     console.log('GET /api/stories - returning', stories.length, 'stories. First story has _id:', stories[0]?._id);
     res.json(stories);
   } catch (err) {
@@ -96,8 +97,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
  */
 router.post('/:id/pages', authMiddleware, async (req, res) => {
   try {
-    const { content, isEnd } = req.body;
-    const page = await storyService.addPage(req.params.id, req.user.id, content, isEnd);
+    const { content, isEnd, endLabel } = req.body;
+    const page = await storyService.addPage(req.params.id, req.user.id, content, isEnd, endLabel);
     res.json(page);
   } catch (err) {
     const statusCode = err.message === 'not found' ? 404 : 
