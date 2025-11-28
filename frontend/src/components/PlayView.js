@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/PlayView.css';
 import '../styles/FantasyTheme.css';
+import '../styles/OceanTheme.css';
+import '../styles/SciFiTheme.css';
+import '../styles/HorrorTheme.css';
+import '../styles/MysteryTheme.css';
+import '../styles/HistoriqueTheme.css';
+import '../styles/RomanceTheme.css';
+import '../styles/AventureTheme.css';
 import RatingSection from './RatingSection';
 import ReportModal from './ReportModal';
 
@@ -163,29 +170,66 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     }
   }
   
-  // Déterminer la classe de thème en se basant sur le thème global (body.dark-theme)
+  // Déterminer la classe de thème
   const getThemeClass = () => {
-    const isDark = typeof document !== 'undefined' && document.body.classList.contains('dark-theme');
-    // si on est en mode clair et que l'histoire a un thème spécifique, appliquer les variantes "-light"
-    if ((storyTheme === 'Fantasy' || storyTheme === 'fantasy') && !isDark) {
-      return 'theme-fantasy-light';
-    }
-    if ((storyTheme === 'Ocean' || storyTheme === 'ocean') && !isDark) {
-      return 'theme-ocean-light';
-    }
-    // Ajouter d'autres thèmes ici plus tard
-    return '';
+    const theme = storyTheme?.toLowerCase() || '';
+    const themeMap = {
+      'fantasy': 'theme-fantasy-light',
+      'ocean': 'theme-ocean-light',
+      'sci-fi': 'theme-sci-fi-light',
+      'horror': 'theme-horror-light',
+      'mystery': 'theme-mystery-light',
+      'historical': 'theme-historique-light',
+      'romance': 'theme-romance-light',
+      'adventure': 'theme-aventure-light',
+    };
+    return themeMap[theme] || '';
   };
   
   return (
     <div className={`play-view-container ${getThemeClass()}`}>
-      {/* Éléments de décor pour fantasy-light */}
-      {(storyTheme === 'Fantasy' || storyTheme === 'fantasy') && userThemeMode === 'light' && (
+      {/* Background Fantasy */}
+      {(storyTheme === 'Fantasy' || storyTheme === 'fantasy') && (
         <div className="theme-background-fantasy-light">
           <div className="fantasy-bg-layer"></div>
           <div className="fantasy-tower"></div>
           <div className="fantasy-dragon"></div>
         </div>
+      )}
+      
+      {/* Background Ocean */}
+      {(storyTheme === 'Ocean' || storyTheme === 'ocean') && (
+        <div className="theme-background-ocean-light"></div>
+      )}
+      
+      {/* Background Sci-Fi */}
+      {(storyTheme === 'Sci-Fi' || storyTheme === 'sci-fi') && (
+        <div className="theme-background-sci-fi-light"></div>
+      )}
+      
+      {/* Background Horror */}
+      {(storyTheme === 'Horror' || storyTheme === 'horror') && (
+        <div className="theme-background-horror-light"></div>
+      )}
+      
+      {/* Background Mystery */}
+      {(storyTheme === 'Mystery' || storyTheme === 'mystery') && (
+        <div className="theme-background-mystery-light"></div>
+      )}
+      
+      {/* Background Historique */}
+      {(storyTheme === 'Historical' || storyTheme === 'historical') && (
+        <div className="theme-background-historique-light"></div>
+      )}
+      
+      {/* Background Romance */}
+      {(storyTheme === 'Romance' || storyTheme === 'romance') && (
+        <div className="theme-background-romance-light"></div>
+      )}
+      
+      {/* Background Aventure */}
+      {(storyTheme === 'Adventure' || storyTheme === 'adventure') && (
+        <div className="theme-background-aventure-light"></div>
       )}
       
       {storyTitle && (

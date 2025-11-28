@@ -1,0 +1,26 @@
+/* ==================== THÈME HISTORIQUE LIGHT ==================== */
+.theme-historique-light {
+  position: relative;
+  min-height: 100vh;
+}
+
+.theme-background-historique-light {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: url('../assets/historique/background_historique.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* ==================== THÈME HISTORIQUE DARK ==================== */
+
+/* Mode sombre : assombrir l'image */
+body.dark-theme .theme-background-historique-light {
+  filter: brightness(0.4) contrast(1.1);
+}

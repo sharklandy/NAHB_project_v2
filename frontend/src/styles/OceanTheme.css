@@ -1,0 +1,28 @@
+/* ==================== THÈME OCEAN LIGHT ==================== */
+.theme-ocean-light {
+  position: relative;
+  min-height: 100vh;
+}
+
+.theme-background-ocean-light {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: url('../assets/ocean/background_ocean.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+
+/* ==================== THÈME OCEAN DARK ==================== */
+
+/* Mode sombre : assombrir l'image */
+body.dark-theme .theme-background-ocean-light {
+  filter: brightness(0.4) contrast(1.1);
+}
+
