@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/PlayView.css';
+import '../styles/FantasyTheme.css';
 import RatingSection from './RatingSection';
 import ReportModal from './ReportModal';
 
