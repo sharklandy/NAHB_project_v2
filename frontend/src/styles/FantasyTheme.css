@@ -1,0 +1,147 @@
+/* ==================== THÈME FANTASY LIGHT ==================== */
+.theme-fantasy-light {
+  position: relative;
+  min-height: 100vh;
+}
+
+.theme-background-fantasy-light {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* Background fixe */
+.fantasy-bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/fantasy-light/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Dragon avec animation d'aller-retour lent avec variations aléatoires */
+.fantasy-dragon {
+  position: absolute;
+  top: 20%;
+  left: -15%;
+  width: 250px;
+  height: 250px;
+  background-image: url('../assets/fantasy-light/dragon.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  animation: 
+    dragonFly 30s infinite,
+    dragonSize 30s infinite,
+    dragonHeight 30s infinite;
+}
+
+@keyframes dragonFly {
+  0% {
+    left: -15%;
+    transform: scaleX(1);
+  }
+  50% {
+    left: 100%;
+    transform: scaleX(1);
+  }
+  51% {
+    transform: scaleX(-1);
+  }
+  100% {
+    left: -15%;
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes dragonSize {
+  0%, 100% {
+    width: 180px;
+    height: 180px;
+  }
+  25% {
+    width: 280px;
+    height: 280px;
+  }
+  50% {
+    width: 220px;
+    height: 220px;
+  }
+  75% {
+    width: 320px;
+    height: 320px;
+  }
+}
+
+@keyframes dragonHeight {
+  0%, 100% {
+    top: 15%;
+  }
+  25% {
+    top: 35%;
+  }
+  50% {
+    top: 10%;
+  }
+  75% {
+    top: 25%;
+  }
+}
+
+/* Ajustements responsive pour le dragon */
+@media (max-width: 768px) {
+  .fantasy-dragon {
+    width: 150px;
+    height: 150px;
+    top: 15%;
+  }
+}
+
+/* Contenu avec fond semi-transparent pour fantasy theme */
+.theme-fantasy-light .story-header,
+.theme-fantasy-light .story-page,
+.theme-fantasy-light .select-message {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* ==================== THÈME FANTASY DARK ==================== */
+
+/* Mode sombre : changer le background */
+body.dark-theme .fantasy-bg-layer {
+  background-image: url('../assets/fantasy-dark/background.jpg');
+  filter: brightness(1);
+}
+
+/* Mode sombre : changer le dragon */
+body.dark-theme .fantasy-dragon {
+  background-image: url('../assets/fantasy-dark/dragon.png');
+  opacity: 0.8;
+  top: 130%;
+  left: -5%;
+    filter: brightness(0.6);
+
+  width: 400px;
+  height: 400px;
+    animation:
+    dragonHeightDark 30s infinite;
+}
+
+@keyframes dragonHeightDark {
+  0%{
+    top: 130%;
+  }
+  100% {
+    top: -40%;
+  }
+}
