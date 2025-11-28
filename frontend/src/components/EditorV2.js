@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Editor.css';
+import '../styles/Editor.css';
 
 /**
  * NOUVEL ÉDITEUR INTUITIF

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './RatingSection.css';
+import '../styles/RatingSection.css';
 
 export default function RatingSection({ api, token, storyId, isAuthenticated }) {
   const [statistics, setStatistics] = useState(null);

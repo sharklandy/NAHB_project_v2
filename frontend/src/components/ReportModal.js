@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ReportModal.css';
+import '../styles/ReportModal.css';
 
 export default function ReportModal({ api, token, storyId, storyTitle, onClose }) {
   const [reason, setReason] = useState('');

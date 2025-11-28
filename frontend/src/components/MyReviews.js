@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './MyReviews.css';
+import '../styles/MyReviews.css';
 
 const api = 'http://localhost:4000/api';
 

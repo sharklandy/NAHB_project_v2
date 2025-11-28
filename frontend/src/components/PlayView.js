@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './PlayView.css';
+import '../styles/PlayView.css';
 import RatingSection from './RatingSection';
 import ReportModal from './ReportModal';
 
@@ -19,6 +19,31 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   const [userThemeMode, setUserThemeMode] = useState(() => {
     return localStorage.getItem('nahb_theme') || 'light';
   });
+  
+  // Écouter les changements de thème
+  useEffect(() => {
+    const handleThemeChange = () => {
+      const newTheme = localStorage.getItem('nahb_theme') || 'light';
+      console.log('Thème changé:', newTheme);
+      setUserThemeMode(newTheme);
+    };
+    
+    window.addEventListener('storage', handleThemeChange);
+    
+    // Vérifier périodiquement (pour les changements dans le même onglet)
+    const interval = setInterval(() => {
+      const currentTheme = localStorage.getItem('nahb_theme') || 'light';
+      if (currentTheme !== userThemeMode) {
+        console.log('Thème actuel:', currentTheme);
+        setUserThemeMode(currentTheme);
+      }
+    }, 100);
+    
+    return () => {
+      window.removeEventListener('storage', handleThemeChange);
+      clearInterval(interval);
+    };
+  }, [userThemeMode]);
   
   useEffect(() => {
     console.log('PlayView useEffect, storyId:', storyId);

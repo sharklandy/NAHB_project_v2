@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './StoryList.css';
+import '../styles/StoryList.css';
 
 const THEMES = [
   { value: '', label: 'Tous les thèmes' },

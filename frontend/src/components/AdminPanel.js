@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './AdminPanel.css';
+import '../styles/AdminPanel.css';
 
 function AdminPanel({ api, token }) {
   const [stats, setStats] = useState(null);

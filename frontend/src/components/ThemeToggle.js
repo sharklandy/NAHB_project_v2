@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './ThemeToggle.css';
+import '../styles/ThemeToggle.css';
 import soleil from '../assets/theme-switch/soleil.png';
 import lune from '../assets/theme-switch/lune.png';
 
