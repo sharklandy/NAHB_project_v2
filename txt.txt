@@ -1,0 +1,3 @@
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd backend; node index.js"
+
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd frontend; npm start"
