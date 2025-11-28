@@ -8,7 +8,9 @@ import PlayView from './components/PlayView';
 import EditorV2 from './components/EditorV2';
 import AdminPanel from './components/AdminPanel';
 import MyReviews from './components/MyReviews';
+import MyStories from './components/MyStories';
 import ThemeToggle from './components/ThemeToggle';
+import ToastContainer from './components/Toast';
 
 const API = process.env.REACT_APP_API || 'http://localhost:4000/api';
 
@@ -42,6 +44,7 @@ function App(){
   return (
     <Router>
       <div>
+        <ToastContainer />
         <header>
           <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
             <h1>NAHB</h1>
@@ -52,6 +55,9 @@ function App(){
               <>
                 <Link to="/">
                   <button>Histoires</button>
+                </Link>
+                <Link to="/my-stories">
+                  <button>Mes Histoires</button>
                 </Link>
                 <Link to="/editor">
                   <button>Editeur</button>
@@ -104,6 +110,7 @@ function App(){
           ) : (
             <Routes>
               <Route path="/" element={<StoryListWrapper api={API} token={token} />} />
+              <Route path="/my-stories" element={<MyStories api={API} token={token} user={user} />} />
               <Route path="/editor" element={<EditorV2 api={API} token={token} user={user} />} />
               <Route path="/my-reviews" element={<MyReviews />} />
               <Route path="/play/:storyId" element={<PlayViewWrapper api={API} token={token} />} />

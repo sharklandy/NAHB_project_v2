@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "nanoid": "^5.1.6",
-    "node-fetch": "^2.7.0"
-  }
-}

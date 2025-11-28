@@ -7,6 +7,8 @@ const playSchema = new mongoose.Schema({
   path: [{ type: String }], // Chemin parcouru (liste des pageIds)
   currentPageId: { type: String, default: null }, // Page actuelle (pour sauvegarde)
   isCompleted: { type: Boolean, default: false }, // Partie terminée ou en cours
+  isPreview: { type: Boolean, default: false }, // Mode preview (auteur teste sans polluer stats)
+  isAbandoned: { type: Boolean, default: false }, // Partie abandonnée (pas complétée dans X jours)
   createdAt: { type: Date, default: Date.now },
   completedAt: { type: Date, default: null }
 });
