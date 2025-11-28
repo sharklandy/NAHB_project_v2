@@ -16,6 +16,9 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   const [unlockedEndings, setUnlockedEndings] = useState([]);
   const [showEndings, setShowEndings] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [userThemeMode, setUserThemeMode] = useState(() => {
+    return localStorage.getItem('nahb_theme') || 'light';
+  });
   
   useEffect(() => {
     console.log('PlayView useEffect, storyId:', storyId);
