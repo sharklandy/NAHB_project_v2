@@ -6,11 +6,13 @@ const { authMiddleware, optionalAuthMiddleware } = require('../middleware/auth')
 /**
  * POST /api/play/:storyId/start
  * Start playing a story
+ * Query param: preview=true for author preview mode
  */
 router.post('/:storyId/start', optionalAuthMiddleware, async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
-    const result = await playService.startStory(req.params.storyId, userId);
+    const isPreview = req.query.preview === 'true';
+    const result = await playService.startStory(req.params.storyId, userId, isPreview);
     res.json(result);
   } catch (err) {
     const statusCode = err.message === 'story not available' ? 404 :

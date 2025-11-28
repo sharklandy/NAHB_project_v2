@@ -3,12 +3,18 @@ const Play = require('../models/Play');
 
 /**
  * Start playing a story
+ * @param {string} storyId - Story ID
+ * @param {string} userId - User ID
+ * @param {boolean} isPreview - Preview mode (author testing, won't affect stats)
  */
-async function startStory(storyId, userId) {
+async function startStory(storyId, userId, isPreview = false) {
   const story = await Story.findById(storyId);
   console.log('Story found:', story ? `${story.title} (status: ${story.status})` : 'null');
   
-  if (!story || story.status !== 'published') {
+  // En mode preview, l'auteur peut tester même si draft
+  if (isPreview && story && story.authorId === userId) {
+    // OK, l'auteur peut prévisualiser son histoire
+  } else if (!story || story.status !== 'published') {
     throw new Error('story not available');
   }
   
@@ -22,17 +28,21 @@ async function startStory(storyId, userId) {
     return { page: start, savedGame: false, playId: null };
   }
   
-  // Check for existing saved game
-  const savedGame = await Play.findOne({
-    storyId: story._id,
-    userId: userId,
-    isCompleted: false
-  }).sort({ createdAt: -1 });
-  
-  if (savedGame && savedGame.currentPageId) {
-    const savedPage = story.pages.find(p => p.pageId === savedGame.currentPageId);
-    if (savedPage) {
-      return { page: savedPage, savedGame: true, playId: savedGame._id };
+  // En mode preview, ne pas charger de partie sauvegardée
+  if (!isPreview) {
+    // Check for existing saved game
+    const savedGame = await Play.findOne({
+      storyId: story._id,
+      userId: userId,
+      isCompleted: false,
+      isPreview: false
+    }).sort({ createdAt: -1 });
+    
+    if (savedGame && savedGame.currentPageId) {
+      const savedPage = story.pages.find(p => p.pageId === savedGame.currentPageId);
+      if (savedPage) {
+        return { page: savedPage, savedGame: true, playId: savedGame._id };
+      }
     }
   }
   
@@ -42,10 +52,11 @@ async function startStory(storyId, userId) {
     userId: userId,
     path: [story.startPageId],
     currentPageId: story.startPageId,
-    isCompleted: false
+    isCompleted: false,
+    isPreview: isPreview
   });
   
-  return { page: start, savedGame: false, playId: newPlay._id };
+  return { page: start, savedGame: false, playId: newPlay._id, isPreview };
 }
 
 /**

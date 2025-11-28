@@ -397,9 +397,35 @@
   font-size: 0.9rem;
 }
 
+/* Make the small red cross button compact so link button has more room */
+.choice-item > .btn-danger {
+  /* compact square button */
+  padding: 6px 8px;
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* Give the choice-target slightly more flex so the Relier button can expand */
+.choice-target {
+  flex: 3;
+}
+
 .choice-target .unlinked {
   color: #f59e0b;
   font-weight: 600;
+  /* Keep the warning text on a single line and aligned with icon */
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0; /* don't let it shrink and wrap */
+  margin-right: 0.5rem;
 }
 
 .node-footer {

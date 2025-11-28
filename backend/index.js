@@ -11,6 +11,7 @@ const playRoutes = require('./routes/playRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const ratingRoutes = require('./routes/ratingRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const authorRoutes = require('./routes/authorRoutes');
 
 // Import models
 const Admin = require('./models/Admin');
@@ -46,6 +47,7 @@ app.use('/api/play', playRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/author', authorRoutes);
 
 // Health check endpoint for Docker
 app.get('/api/health', (req, res) => {

@@ -24,6 +24,10 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   const [unlockedEndings, setUnlockedEndings] = useState([]);
   const [showEndings, setShowEndings] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [showReadMoreModal, setShowReadMoreModal] = useState(false);
+  const [readMoreContent, setReadMoreContent] = useState('');
+  const [readMoreTitle, setReadMoreTitle] = useState('');
   const [userThemeMode, setUserThemeMode] = useState(() => {
     return localStorage.getItem('nahb_theme') || 'light';
   });
@@ -57,16 +61,44 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     console.log('PlayView useEffect, storyId:', storyId);
     if(storyId) {
       setCurrentStoryId(storyId);
-      startStory(storyId);
+      // Check if preview mode from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const preview = urlParams.get('preview') === 'true';
+      setIsPreviewMode(preview);
+      startStory(storyId, preview);
     }
   }, [storyId]);
+
+  function excerpt(text, maxLength = 160) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    const truncated = text.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    if (lastSpace > Math.floor(maxLength * 0.6)) {
+      return truncated.slice(0, lastSpace) + '…';
+    }
+    return truncated + '…';
+  }
+
+  function openReadMore(content, title = '') {
+    setReadMoreContent(content || '');
+    setReadMoreTitle(title || '');
+    setShowReadMoreModal(true);
+  }
+
+  function closeReadMore() {
+    setShowReadMoreModal(false);
+    setReadMoreContent('');
+    setReadMoreTitle('');
+  }
   
-  async function startStory(id){
+  async function startStory(id, preview = false){
     const headers = {};
     if (token) {
       headers.Authorization = 'Bearer ' + token;
     }
-    const r2 = await fetch(api + '/play/' + id + '/start', { 
+    const url = preview ? api + '/play/' + id + '/start?preview=true' : api + '/play/' + id + '/start';
+    const r2 = await fetch(url, { 
       method: 'POST', 
       headers: headers
     });
@@ -78,6 +110,7 @@ export default function PlayView({ api, token, storyId, onBackToList }){
     setPage(j.page);
     setPlayId(j.playId);
     setPath([j.page.pageId]);
+    setIsPreviewMode(j.isPreview || false);
     
     const res = await fetch(api + '/stories/' + id);
     const story = await res.json();
@@ -188,6 +221,13 @@ export default function PlayView({ api, token, storyId, onBackToList }){
   
   return (
     <div className={`play-view-container ${getThemeClass()}`}>
+      {/* Preview mode banner */}
+      {isPreviewMode && (
+        <div className="preview-mode-banner">
+          👁️ MODE PRÉVISUALISATION - Cette session ne sera pas enregistrée dans les statistiques
+        </div>
+      )}
+      
       {/* Background Fantasy */}
       {(storyTheme === 'Fantasy' || storyTheme === 'fantasy') && (
         <div className="theme-background-fantasy-light">
@@ -301,10 +341,15 @@ export default function PlayView({ api, token, storyId, onBackToList }){
                   {showEndings && (
                     <div className="endings-list">
                       {unlockedEndings.map((ending, idx) => (
-                        <div key={idx} className="unlocked-ending-card">
-                          <h6>{ending.label}</h6>
-                          <p>{ending.content.substring(0, 100)}...</p>
-                        </div>
+                            <div key={idx} className="unlocked-ending-card">
+                              <h6>{ending.label}</h6>
+                              <div className="unlocked-ending-body">
+                                <p>{excerpt(ending.content, 160)}</p>
+                                {ending.content && ending.content.length > 160 && (
+                                  <button className="read-more-btn" onClick={() => openReadMore(ending.content, ending.label)}>Lire la suite</button>
+                                )}
+                              </div>
+                            </div>
                       ))}
                     </div>
                   )}
@@ -368,6 +413,27 @@ export default function PlayView({ api, token, storyId, onBackToList }){
           onClose={() => setShowReportModal(false)}
         />
       )}
+      {/* Read More Modal */}
+      {showReadMoreModal && (
+        <div className="modal-overlay" onClick={closeReadMore}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{readMoreTitle || 'Contenu'}</h3>
+              <button className="modal-close" onClick={closeReadMore}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="read-more-content">
+                <p>{readMoreContent}</p>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={closeReadMore}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+// Read More modal is rendered inside PlayView; keep helper exported if needed elsewhere
