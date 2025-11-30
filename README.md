@@ -51,3 +51,6 @@ Le frontend démarre sur `http://localhost:3000`
 Pour tester l'application, vous pouvez :
 - Créer un nouveau compte via l'interface d'inscription
 - Ou utiliser les comptes existants dans la base de données
+
+identifiant : admin.nahb.local
+psswd : admin123
