@@ -47,7 +47,9 @@ function App(){
         <ToastContainer />
         <header>
           <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
-            <h1>NAHB</h1>
+            <Link to="/" style={{textDecoration: 'none', color: 'inherit'}}>
+              <h1 style={{cursor: 'pointer'}}>NAHB</h1>
+            </Link>
             <ThemeToggle />
           </div>
           <nav>

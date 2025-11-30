@@ -78,7 +78,12 @@ header h1 {
   margin-bottom: 0;
   font-weight: 700;
   letter-spacing: -0.5px;
-  white-space: nowrap;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+header h1:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
 }
 
 nav {

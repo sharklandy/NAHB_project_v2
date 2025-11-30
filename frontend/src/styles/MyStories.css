@@ -43,20 +43,20 @@
   text-align: center;
   font-size: 1.2rem;
   padding: 3rem;
-  color: #666;
+  color: var(--text-secondary, #666);
 }
 
 .no-stories {
   text-align: center;
   padding: 4rem 2rem;
-  background: var(--card-bg, #f8f9fa);
+  background: var(--bg-secondary, #f8f9fa);
   border-radius: 12px;
   margin-top: 2rem;
 }
 
 .no-stories p {
   font-size: 1.2rem;
-  color: #666;
+  color: var(--text-secondary, #666);
   margin-bottom: 2rem;
 }
 
@@ -76,7 +76,7 @@
 
 /* Story Card */
 .story-card {
-  background: var(--card-bg, white);
+  background: var(--bg-secondary, white);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -101,7 +101,7 @@
 .story-card-header h3 {
   margin: 0;
   font-size: 1.4rem;
-  color: var(--text-color, #333);
+  color: var(--text-primary, #333);
   flex: 1;
 }
 
@@ -131,7 +131,7 @@
 
 /* Story Description */
 .story-description {
-  color: #666;
+  color: var(--text-secondary, #666);
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0;
@@ -159,14 +159,14 @@
 
 .story-pages {
   padding: 0.3rem 0.8rem;
-  background: #f5f5f5;
-  color: #666;
+  background: var(--bg-tertiary, #f5f5f5);
+  color: var(--text-secondary, #666);
   border-radius: 15px;
 }
 
 /* Story Stats */
 .story-stats {
-  background: var(--stats-bg, #f8f9fa);
+  background: var(--bg-tertiary, #f8f9fa);
   border-radius: 8px;
   padding: 1rem;
 }
@@ -174,7 +174,7 @@
 .story-stats h4 {
   margin: 0 0 1rem 0;
   font-size: 1rem;
-  color: var(--text-color, #333);
+  color: var(--text-primary, #333);
 }
 
 .stats-grid {
@@ -196,13 +196,13 @@
   align-items: center;
   text-align: center;
   padding: 0.5rem;
-  background: white;
+  background: var(--bg-secondary, white);
   border-radius: 6px;
 }
 
 .stat-label {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-tertiary, #888);
   margin-bottom: 0.3rem;
 }
 
@@ -216,13 +216,13 @@
 .end-distribution {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 }
 
 .end-distribution h5 {
   margin: 0 0 0.8rem 0;
   font-size: 0.9rem;
-  color: var(--text-color, #333);
+  color: var(--text-primary, #333);
 }
 
 .end-item {
@@ -232,7 +232,7 @@
 .end-label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #555;
+  color: var(--text-secondary, #555);
   display: block;
   margin-bottom: 0.3rem;
 }
@@ -241,7 +241,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #e0e0e0;
+  background: var(--border-color, #e0e0e0);
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -258,7 +258,7 @@
 .end-count {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #555;
+  color: var(--text-secondary, #555);
   position: absolute;
   right: 8px;
   z-index: 1;
@@ -339,7 +339,7 @@
 }
 
 .modal-content {
-  background: var(--card-bg, white);
+  background: var(--bg-secondary, white);
   border-radius: 12px;
   max-width: 800px;
   width: 100%;
@@ -355,13 +355,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.5rem;
-  color: var(--text-color, #333);
+  color: var(--text-primary, #333);
 }
 
 .modal-close {
@@ -369,7 +369,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #999;
+  color: var(--text-tertiary, #999);
   padding: 0;
   width: 30px;
   height: 30px;
@@ -381,8 +381,8 @@
 }
 
 .modal-close:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--bg-tertiary, #f0f0f0);
+  color: var(--text-primary, #333);
 }
 
 .modal-body {
@@ -391,7 +391,7 @@
 
 .modal-footer {
   padding: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -406,7 +406,7 @@
 }
 
 .advanced-stat-card {
-  background: var(--stats-bg, #f8f9fa);
+  background: var(--bg-tertiary, #f8f9fa);
   padding: 1.5rem;
   border-radius: 8px;
   text-align: center;
@@ -415,7 +415,7 @@
 .advanced-stat-card h4 {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary, #666);
   font-weight: 600;
 }
 
@@ -430,14 +430,14 @@
 .most-visited-pages {
   margin-top: 2rem;
   padding: 1rem;
-  background: var(--stats-bg, #f8f9fa);
+  background: var(--bg-tertiary, #f8f9fa);
   border-radius: 8px;
 }
 
 .most-visited-pages h4 {
   margin: 0 0 1rem 0;
   font-size: 1.1rem;
-  color: var(--text-color, #333);
+  color: var(--text-primary, #333);
 }
 
 .pages-list {
@@ -451,7 +451,7 @@
   align-items: center;
   gap: 1rem;
   padding: 0.8rem;
-  background: white;
+  background: var(--bg-secondary, white);
   border-radius: 6px;
 }
 
@@ -464,7 +464,7 @@
 .page-content {
   flex: 1;
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-secondary, #555);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -483,7 +483,7 @@
 .read-more-content p {
   white-space: pre-wrap;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-primary, #333);
 }
 
 @keyframes modalFadeScale {
@@ -499,7 +499,7 @@
 
 .page-visits {
   font-weight: 600;
-  color: #888;
+  color: var(--text-tertiary, #888);
   font-size: 0.85rem;
   white-space: nowrap;
 }

@@ -120,12 +120,14 @@
   color: var(--text-primary);
 }
 .admin-row.banned {
-  /* light red for banned users in light mode */
-  background: #fff1f2;
+  /* light red for banned users in light mode, darker red for dark mode */
+  background: var(--bg-tertiary);
+  border-left: 3px solid #ef4444;
 }
 .admin-row.suspended {
-  /* light red for suspended stories in light mode */
-  background: #fff1f2;
+  /* light red for suspended stories in light mode, darker red for dark mode */
+  background: var(--bg-tertiary);
+  border-left: 3px solid #ef4444;
 }
 
 .admin-error {
